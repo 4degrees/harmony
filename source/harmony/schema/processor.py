@@ -15,8 +15,9 @@ class Processor(object):
         '''Process *schemas*
         :py:class:`collection <harmony.schema.collection.Collection>`.
 
-        Return a new :py:class:`~harmony.schema.collection.Collection` of
-        *schemas* after processing.
+        .. note::
+
+            *schemas* are modified in place.
 
         '''
 
