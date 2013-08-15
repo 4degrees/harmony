@@ -2,8 +2,6 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
-import copy
-
 from ..error import SchemaConflictError
 
 
@@ -22,19 +20,13 @@ class Collection(object):
 
         Raise SchemaConflictError if a schema with the same id already exists.
 
-        .. note::
-
-            A copy of the schema is stored and changing the original schema
-            will have no effect on the one registered. To change a schema
-            definition, remove and re-add it.
-
         '''
         schema_id = schema['id']
 
         try:
             self.get(schema_id)
         except KeyError:
-            self._schemas[schema_id] = copy.deepcopy(schema)
+            self._schemas[schema_id] = schema
         else:
             raise SchemaConflictError('A schema is already registered with '
                                       'id {0}'.format(schema_id))
@@ -51,7 +43,7 @@ class Collection(object):
         self._schemas.clear()
 
     def get(self, schema_id):
-        '''Return a copy of the schema registered with *schema_id*.
+        '''Return schema registered with *schema_id*.
 
         Raise KeyError if no schema with *schema_id* registered.
 
@@ -61,7 +53,7 @@ class Collection(object):
         except KeyError:
             raise KeyError('No schema found with id {0}'.format(schema_id))
         else:
-            return copy.deepcopy(schema)
+            return schema
 
     def items(self):
         '''Yield (id, schema) pairs.'''
