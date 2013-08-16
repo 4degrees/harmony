@@ -6,6 +6,7 @@ import urlparse
 from abc import ABCMeta, abstractmethod
 
 import harmony.schema
+from harmony.schema.validator import validator_for
 
 
 class Processor(object):
@@ -23,6 +24,36 @@ class Processor(object):
             *schemas* are modified in place.
 
         '''
+
+
+class ValidateProcessor(Processor):
+    '''Check schemas are valid against specification.'''
+
+    def __init__(self, validator_class=None):
+        '''Initialise processor.
+
+        *validator_class* indicates the validator to use for checking the
+        schemas. If not specified, an appropriate validator will be chosen for
+        each schema checked.
+
+        '''
+        self.validator_class = validator_class
+        super(ValidateProcessor, self).__init__()
+
+    def process(self, schemas):
+        '''Process *schemas*
+        :py:class:`collection <harmony.schema.collection.Collection>`.
+
+        Raise SchemaError if any of the schemas are invalid.
+
+        '''
+        for schema in schemas:
+            # Pick appropriate validator if none specified.
+            validator_class = self.validator_class
+            if validator_class is None:
+                validator_class = validator_for(schema)
+
+            validator_class.check_schema(schema)
 
 
 class MixinProcessor(Processor):
