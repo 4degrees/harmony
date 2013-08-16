@@ -6,6 +6,8 @@ import copy
 import urlparse
 from abc import ABCMeta, abstractmethod
 
+import jsonpointer
+
 from harmony.schema.validator import validator_for
 
 
@@ -115,26 +117,59 @@ class MixinProcessor(Processor):
             self._process(mixin, schemas)
 
             # Merge mixin into the referring fragment.
-            self._merge(fragment, mixin)
+            self._merge(fragment, mixin, entry.get('hints', {}))
 
-    def _merge(self, target, reference):
-        '''Merge *reference* dictionary into *target* dictionary.
+    def _merge(self, target, reference, hints):
+        '''Merge *reference* dictionary into *target* dictionary using *hints*.
 
         *target* has precedence in the merge which follows the rules:
 
             * New keys in *reference* are added to *target*.
             * Keys already present in *target* are not overwritten.
             * When the same key exists in both and the value is a dictionary,
-              the dictionaries are also merged.
+              the dictionaries are recursively merged.
+            * When the same key exists in both and the value is an array,
+              the arrays combined (avoiding duplicate entries).
+
+        *hints* can be used to alter the merge. It should be a dictionary of
+        {path: operation}. Operation may be one of:
+
+            * preserve - Use the target value exclusively.
+            * overwrite - Use the reference value exclusively.
+
+        For example, to specify that the department array on the target should
+        not be altered::
+
+            {"/properties/department/enum": "preserve"}
 
         '''
         for key, value in reference.items():
+            relevant_hint = hints.get('/{0}'.format(key))
 
-            if not key in target:
+            if relevant_hint == 'preserve':
+                continue
+
+            if not key in target or relevant_hint == 'overwrite':
                 # Copy value to target
                 target[key] = copy.deepcopy(value)
 
             else:
-                # Merge if both target and reference value is a dictionary
+                # Recursive merge if both target and reference value are
+                # dictionaries.
                 if isinstance(value, dict) and isinstance(target[key], dict):
-                    self._merge(target[key], value)
+
+                    # Scope hints to nested only.
+                    child_hints = {}
+                    for path in hints:
+                        if path.startswith('/{0}/'.format(key)):
+                            child_hints[path[len(key) + 1:]] = hints[path]
+
+                    self._merge(target[key], value, child_hints)
+
+                # Combine arrays.
+                if isinstance(value, list) and isinstance(target[key], list):
+
+                    for entry in value:
+                        if not entry in target[key]:
+                            target[key].append(entry)
+
