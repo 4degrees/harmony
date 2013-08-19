@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 
 import jsonpointer
 
-from harmony.schema.validator import validator_for
+from harmony.schema.validator import Validator
 
 
 class Processor(object):
@@ -35,11 +35,13 @@ class ValidateProcessor(Processor):
         '''Initialise processor.
 
         *validator_class* indicates the validator to use for checking the
-        schemas. If not specified, an appropriate validator will be chosen for
-        each schema checked.
+        schemas. Defaults to :py:class:`harmony.schema.validator.Validator`.
 
         '''
         self.validator_class = validator_class
+        if self.validator_class is None:
+            self.validator_class = Validator
+
         super(ValidateProcessor, self).__init__()
 
     def process(self, schemas):
@@ -50,12 +52,7 @@ class ValidateProcessor(Processor):
 
         '''
         for schema in schemas:
-            # Pick appropriate validator if none specified.
-            validator_class = self.validator_class
-            if validator_class is None:
-                validator_class = validator_for(schema)
-
-            validator_class.check_schema(schema)
+            self.validator_class.check_schema(schema)
 
 
 class MixinProcessor(Processor):
