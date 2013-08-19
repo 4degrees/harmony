@@ -14,10 +14,26 @@ except ImportError:
 import jsonschema.validators
 
 
+# Custom validators
+def _required(validator, required, instance, schema):
+    '''Validate 'required' properties.'''
+    if not validator.is_type(instance, 'object'):
+        return
+
+    for index, requirement in enumerate(required):
+        if requirement not in instance:
+            error = jsonschema.ValidationError(
+                '{0!r} is a required property'.format(requirement)
+            )
+            error.schema_path.append(index)
+            yield error
+
+
 # Construct validator as extension of Json Schema Draft 4.
 Validator = jsonschema.validators.extend(
     validator=jsonschema.validators.Draft4Validator,
     validators={
+        'required': _required
     }
 )
 
