@@ -67,3 +67,46 @@ class Session(object):
         for processor in self.processors:
             processor.process(self.schemas)
 
+    def validate(self, instance, additional_schemas=None):
+        '''Validate *instance*.
+
+        If *additional_schemas* is supplied, will also validate against those.
+        Each schema may be either a registered schema id or a schema object.
+
+        Return any errors as a list of objects containing full diagnostic
+        information.
+
+        '''
+        # Validate against base system requirements.
+        errors = self._validate(instance, ['harmony:/base'])
+        if errors:
+            return errors
+
+        # Validate against specified harmony schema.
+        errors = self._validate(instance, [instance['harmony_type']])
+        if errors:
+            return errors
+
+        # Validate against additional schemas if required.
+        errors = self._validate(instance, additional_schemas)
+        return errors
+
+    def _validate(self, instance, schemas):
+        '''Validate *instance* against *schemas*.
+
+        Each schema may be either a registered schema id or a schema object.
+
+        Return any errors as a list of objects containing full diagnostic
+        information.
+
+        '''
+        errors = []
+        for schema in schemas:
+            if isinstance(schema, basestring):
+                schema = self.schemas.get(schema)
+
+            validator = self.validator_class(schema)
+            errors.extend(list(validator.iter_errors(instance)))
+
+        return errors
+
