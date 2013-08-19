@@ -41,6 +41,27 @@
             "minItems": 1,
             "type": "array",
             "uniqueItems": true
+        },
+        "mixin": {
+            "type": "object",
+            "properties": {
+                "$ref": {
+                    "format": "uri",
+                    "type": "string"
+                },
+                "hints": {
+                    "type": "object",
+                    "patternProperties": {
+                        ".*": {
+                            "enum": [
+                                "overwrite",
+                                "preserve"
+                            ]
+                        }
+                    }
+                }
+            },
+            "required": ["$ref"]
         }
     },
     "dependencies": {
@@ -52,11 +73,24 @@
         ]
     },
     "description": "Core schema meta-schema",
-    "id": "http://json-schema.org/draft-04/schema#",
+    "id": "harmony:/schema/1#",
     "properties": {
         "$schema": {
             "format": "uri",
             "type": "string"
+        },
+        "$mixin": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/mixin"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/mixin"
+                    },
+                    "type": "array"
+                }
+            ]
         },
         "additionalItems": {
             "anyOf": [
@@ -190,6 +224,9 @@
             },
             "default": {},
             "type": "object"
+        },
+        "propertyOrder": {
+            "$ref": "#/definitions/stringArray"
         },
         "required": {
             "$ref": "#/definitions/stringArray"
