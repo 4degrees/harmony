@@ -27,6 +27,15 @@ class Widget(QtGui.QFrame):
         self.description = description
         self.required = required
 
+    def construct(self):
+        '''Construct widget.'''
+        self.title_label = QtGui.QLabel()
+        self.required_indicator = QtGui.QLabel()
+        self.error_indicator = QtGui.QLabel()
+
+    def post_construction(self):
+        '''Perform post-construction operations.'''
+
     @property
     def title(self):
         '''Return title value as stored in widget.'''
@@ -86,12 +95,3 @@ class Widget(QtGui.QFrame):
     def value(self, value):
         '''Set current *value*.'''
         raise NotImplementedError()
-
-    def construct(self):
-        '''Construct widget.'''
-        self.title_label = QtGui.QLabel()
-        self.required_indicator = QtGui.QLabel()
-        self.error_indicator = QtGui.QLabel()
-
-    def post_construction(self):
-        '''Perform post-construction operations.'''
