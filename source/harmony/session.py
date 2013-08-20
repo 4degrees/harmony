@@ -67,6 +67,55 @@ class Session(object):
         for processor in self.processors:
             processor.process(self.schemas)
 
+    def instantiate(self, schema, data=None):
+        '''Instantiate *schema* with initial *data*.
+
+        *schema* may be either a registered schema id or a schema object.
+
+        Only required properties with default values will be used from the
+        schema to construct the instance. Any values in *data* will take
+        precedence over those in the schema.
+
+        '''
+        if isinstance(schema, basestring):
+            schema = self.schemas.get(schema)
+
+        if data is None:
+            data = {}
+
+        return self._instantiate(schema, data)
+
+    def _instantiate(self, schema, data):
+        '''Construct an instance of *schema* using initial *data*.'''
+        required_properties = schema.get('required', [])
+
+        for key, value in schema.get('properties').items():
+            required = key in required_properties
+            datatype = value.get('type')
+
+            if not required:
+                # Don't recursively process non-required non-objects.
+                if datatype != 'object':
+                    continue
+
+                # Don't recursively process objects that are not required if
+                # the object does not already exist on the instance.
+                if key not in data:
+                    continue
+
+            if datatype == 'object':
+                # Recursively process objects.
+                data.setdefault(key, {})
+                self._instantiate(value, data[key])
+
+            else:
+                # Set default values.
+                default = value.get('default')
+                if default:
+                    data.setdefault(key, default)
+
+        return data
+
     def validate(self, instance, additional_schemas=None):
         '''Validate *instance*.
 
