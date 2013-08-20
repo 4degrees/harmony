@@ -15,8 +15,8 @@ class Widget(QtGui.QFrame):
     # Emit when value changes.
     value_changed = QtCore.Signal()
 
-    def __init__(self, title, description=None, required=False, value=None,
-                 parent=None):
+    def __init__(self, title=None, description=None, required=False,
+                 value=None, parent=None):
         '''Initialise widget with *parent*.'''
         super(Widget, self).__init__(parent=parent)
 
