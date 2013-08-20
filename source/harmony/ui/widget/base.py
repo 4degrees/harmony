@@ -36,6 +36,15 @@ class Widget(QtGui.QFrame):
     def _postConstruction(self):
         '''Perform post-construction operations.'''
 
+    def _emitValueChanged(self, *args, **kw):
+        '''Emit valueChanged signal.
+
+        Subclasses should call this to notify system that the value has changed
+        either programmatically or as a result of user input.
+
+        '''
+        self.valueChanged.emit()
+
     def title(self):
         '''Return title value as stored in widget.'''
         return self._titleLabel.text()
