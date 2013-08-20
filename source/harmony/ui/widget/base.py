@@ -16,25 +16,26 @@ class Widget(QtGui.QFrame):
     valueChanged = QtCore.Signal()
 
     def __init__(self, title=None, description=None, required=False,
-                 parent=None):
+                 parent=None, **kw):
         '''Initialise widget with *parent*.'''
         super(Widget, self).__init__(parent=parent)
+        self._construct(title=title, description=description,
+                        required=required, **kw)
 
-        self._construct()
-        self._postConstruction()
+        self._postConstruction(title=title, description=description,
+                               required=required, **kw)
 
-        self.setTitle(title)
-        self.setDescription(description)
-        self.setRequired(required)
-
-    def _construct(self):
+    def _construct(self, **kw):
         '''Construct widget.'''
         self._titleLabel = QtGui.QLabel()
         self._requiredIndicator = QtGui.QLabel()
         self._errorIndicator = QtGui.QLabel()
 
-    def _postConstruction(self):
+    def _postConstruction(self, title, description, required, **kw):
         '''Perform post-construction operations.'''
+        self.setTitle(title)
+        self.setDescription(description)
+        self.setRequired(required)
 
     def _emitValueChanged(self, *args, **kw):
         '''Emit valueChanged signal.

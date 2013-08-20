@@ -10,9 +10,9 @@ from .base import Widget
 class Simple(Widget):
     '''Simple widget that wraps a single control.'''
 
-    def _construct(self):
+    def _construct(self, **kw):
         '''Construct widget.'''
-        super(Simple, self)._construct()
+        super(Simple, self)._construct(**kw)
         self.setLayout(QtGui.QHBoxLayout())
 
         self.layout().addWidget(self._requiredIndicator)
@@ -24,11 +24,11 @@ class Simple(Widget):
         self._prefix.layout().addWidget(self._titleLabel)
         self.layout().addWidget(self._prefix, stretch=0)
 
-        self._control = self._constructControl()
+        self._control = self._constructControl(**kw)
         self.layout().addWidget(self._control, stretch=1)
         self.layout().addWidget(self._errorIndicator, stretch=0)
 
-    def _constructControl(self):
+    def _constructControl(self, **kw):
         '''Return the control widget.
 
         Subclasses should override this to return an appropriate control
