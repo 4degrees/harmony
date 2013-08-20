@@ -63,6 +63,21 @@ class Widget(QtGui.QFrame):
             self.required_indicator.setToolTip('')
 
     @property
+    def error(self):
+        '''Return current error value.'''
+        return self.error_indicator.toolTip()
+
+    @error.setter
+    def error(self, value):
+        '''Set error to *value*.'''
+        if value:
+            self.error_indicator.setPixmap(QtGui.QPixmap())
+            self.error_indicator.setToolTip(value)
+        else:
+            self.error_indicator.setPixmap(QtGui.QPixmap())
+            self.error_indicator.setToolTip('')
+
+    @property
     def value(self):
         '''Return current value.'''
         raise NotImplementedError()
