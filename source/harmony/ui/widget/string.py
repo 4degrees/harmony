@@ -11,12 +11,7 @@ class String(Simple):
     '''Single line text based input.'''
 
     def _constructControl(self, **kw):
-        '''Return the control widget.
-
-        Subclasses should override this to return an appropriate control
-        widget.
-
-        '''
+        '''Return the control widget.'''
         return QtGui.QLineEdit()
 
     def _postConstruction(self, **kw):

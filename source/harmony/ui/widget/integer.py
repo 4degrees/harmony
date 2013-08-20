@@ -22,12 +22,7 @@ class Integer(Simple):
         super(Integer, self).__init__(minimum=minimum, maximum=maximum, **kw)
 
     def _constructControl(self, minimum, maximum, **kw):
-        '''Return the control widget.
-
-        Subclasses should override this to return an appropriate control
-        widget.
-
-        '''
+        '''Return the control widget.'''
         control = QtGui.QSpinBox()
 
         if minimum is None:
