@@ -16,7 +16,7 @@ class Widget(QtGui.QFrame):
     value_changed = QtCore.Signal()
 
     def __init__(self, title=None, description=None, required=False,
-                 value=None, parent=None):
+                 parent=None):
         '''Initialise widget with *parent*.'''
         super(Widget, self).__init__(parent=parent)
 
@@ -26,7 +26,6 @@ class Widget(QtGui.QFrame):
         self.title = title
         self.description = description
         self.required = required
-        self.value = value
 
     @property
     def title(self):
