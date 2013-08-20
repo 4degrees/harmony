@@ -13,6 +13,11 @@ from harmony.schema.validator import Validator
 class Session(object):
     '''A configuration of the various components in a standard way.'''
 
+    #: The default schema search path.
+    DEFAULT_SCHEMA_PATH = os.path.join(
+        os.path.dirname(__file__), '..', '..', 'resource', 'schema'
+    )
+
     def __init__(self, collector=None, processors=None, validator_class=None):
         '''Initialise session.
 
@@ -37,7 +42,9 @@ class Session(object):
 
         self.collector = collector
         if self.collector is None:
-            paths = os.environ.get('HARMONY_SCHEMA_PATH', '').split(os.pathsep)
+            paths = os.environ.get(
+                'HARMONY_SCHEMA_PATH', self.DEFAULT_SCHEMA_PATH
+            ).split(os.pathsep)
             self.collector = FilesystemCollector(paths)
 
         self.validator_class = validator_class
