@@ -13,7 +13,7 @@ class Widget(QtGui.QFrame):
     '''
 
     # Emit when value changes.
-    value_changed = QtCore.Signal()
+    valueChanged = QtCore.Signal()
 
     def __init__(self, title=None, description=None, required=False,
                  parent=None):
@@ -21,77 +21,67 @@ class Widget(QtGui.QFrame):
         super(Widget, self).__init__(parent=parent)
 
         self._construct()
-        self._post_construction()
+        self._postConstruction()
 
-        self.title = title
-        self.description = description
-        self.required = required
+        self.setTitle(title)
+        self.setDescription(description)
+        self.setRequired(required)
 
     def _construct(self):
         '''Construct widget.'''
-        self._title_label = QtGui.QLabel()
-        self._required_indicator = QtGui.QLabel()
-        self._error_indicator = QtGui.QLabel()
+        self._titleLabel = QtGui.QLabel()
+        self._requiredIndicator = QtGui.QLabel()
+        self._errorIndicator = QtGui.QLabel()
 
-    def _post_construction(self):
+    def _postConstruction(self):
         '''Perform post-construction operations.'''
 
-    @property
     def title(self):
         '''Return title value as stored in widget.'''
-        return self._title_label.text()
+        return self._titleLabel.text()
 
-    @title.setter
-    def title(self, value):
+    def setTitle(self, value):
         '''Set title to *value*.'''
-        self._title_label.setText(value)
+        self._titleLabel.setText(value)
 
-    @property
     def description(self):
         '''Return description value as stored in widget.'''
-        return self._title_label.toolTip()
+        return self._titleLabel.toolTip()
 
-    @description.setter
-    def description(self, value):
+    def setDescription(self, value):
         '''Set description to *value*.'''
-        self._title_label.setToolTip(value)
+        self._titleLabel.setToolTip(value)
 
-    @property
     def required(self):
         '''Return current required status.'''
-        return self._required_indicator.pixmap() != None
+        return self._requiredIndicator.pixmap() != None
 
-    @required.setter
-    def required(self, value):
+    def setRequired(self, value):
         '''Set required status to boolean *value*.'''
         if value:
-            self._required_indicator.setPixmap(QtGui.QPixmap())
-            self._required_indicator.setToolTip('Required')
+            self._requiredIndicator.setPixmap(QtGui.QPixmap())
+            self._requiredIndicator.setToolTip('Required')
         else:
-            self._required_indicator.setPixmap(QtGui.QPixmap())
-            self._required_indicator.setToolTip('')
+            self._requiredIndicator.setPixmap(QtGui.QPixmap())
+            self._requiredIndicator.setToolTip('')
 
-    @property
     def error(self):
         '''Return current error value.'''
-        return self._error_indicator.toolTip()
+        return self._errorIndicator.toolTip()
 
-    @error.setter
-    def error(self, value):
+    def setError(self, value):
         '''Set error to *value*.'''
         if value:
-            self._error_indicator.setPixmap(QtGui.QPixmap())
-            self._error_indicator.setToolTip(value)
+            self._errorIndicator.setPixmap(QtGui.QPixmap())
+            self._errorIndicator.setToolTip(value)
         else:
-            self._error_indicator.setPixmap(QtGui.QPixmap())
-            self._error_indicator.setToolTip('')
+            self._errorIndicator.setPixmap(QtGui.QPixmap())
+            self._errorIndicator.setToolTip('')
 
-    @property
     def value(self):
         '''Return current value.'''
         raise NotImplementedError()
 
-    @value.setter
-    def value(self, value):
+    def setValue(self, value):
         '''Set current *value*.'''
         raise NotImplementedError()
