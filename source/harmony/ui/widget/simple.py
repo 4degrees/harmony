@@ -10,25 +10,17 @@ from .base import Widget
 class Simple(Widget):
     '''Simple widget that wraps a single control.'''
 
-    def _construct(self, **kw):
+    def _construct(self):
         '''Construct widget.'''
-        super(Simple, self)._construct(**kw)
+        super(Simple, self)._construct()
         self.setLayout(QtGui.QHBoxLayout())
 
-        self.layout().addWidget(self._requiredIndicator)
-        self.layout().addWidget(self._titleLabel)
+        self._control = self._constructControl()
 
-        self._prefix = QtGui.QFrame()
-        self._prefix.setLayout(QtGui.QHBoxLayout())
-        self._prefix.layout().addWidget(self._requiredIndicator)
-        self._prefix.layout().addWidget(self._titleLabel)
-        self.layout().addWidget(self._prefix, stretch=0)
-
-        self._control = self._constructControl(**kw)
         self.layout().addWidget(self._control, stretch=1)
-        self.layout().addWidget(self._errorIndicator, stretch=0)
+        self.layout().addWidget(self._errorIndicator)
 
-    def _constructControl(self, **kw):
+    def _constructControl(self):
         '''Return the control widget.
 
         Subclasses should override this to return an appropriate control
@@ -36,6 +28,11 @@ class Simple(Widget):
 
         '''
         raise NotImplementedError()
+
+    def setDescription(self, value):
+        '''Set description to *value*.'''
+        super(Simple, self).setDescription(value)
+        self._control.setToolTip(self._description)
 
     def value(self):
         '''Return current value.'''

@@ -4,10 +4,10 @@
 
 from PySide import QtGui
 
-from .simple import Simple
+from .string import String
 
 
-class Integer(Simple):
+class Integer(String):
     '''Number input without fraction or exponent part.'''
 
     DEFAULT_RANGE = (-9999999, 9999999)
@@ -19,33 +19,33 @@ class Integer(Simple):
         *maximum* is the maximum value that can be selected.
 
         '''
-        super(Integer, self).__init__(minimum=minimum, maximum=maximum, **kw)
+        self._minimum = minimum
+        if self._minimum is None:
+            self._minimum = self.DEFAULT_RANGE[0]
 
-    def _constructControl(self, minimum, maximum, **kw):
+        self._maximum = maximum
+        if self._maximum is None:
+            self._maximum = self.DEFAULT_RANGE[1]
+
+        super(Integer, self).__init__(**kw)
+
+    def _constructControl(self):
         '''Return the control widget.'''
-        control = QtGui.QSpinBox()
-
-        if minimum is None:
-            minimum = self.DEFAULT_RANGE[0]
-
-        control.setMinimum(minimum)
-
-        if maximum is None:
-            maximum = self.DEFAULT_RANGE[1]
-
-        control.setMaximum(maximum)
+        control = super(Integer, self)._constructControl()
+        control.setValidator(
+            QtGui.QIntValidator(self._minimum, self._maximum, self)
+        )
 
         return control
 
-    def _postConstruction(self, **kw):
-        '''Perform post-construction operations.'''
-        super(Integer, self)._postConstruction(**kw)
-        self._control.valueChanged.connect(self._emitValueChanged)
-
     def value(self):
         '''Return current value.'''
-        return self._control.value()
+        value = super(Integer, self).value()
+        try:
+            return int(value)
+        except ValueError:
+            return None
 
     def setValue(self, value):
         '''Set current *value*.'''
-        self._control.setValue(value)
+        super(Integer, self).setValue(str(value))

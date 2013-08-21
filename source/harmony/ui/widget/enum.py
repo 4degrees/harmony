@@ -17,28 +17,43 @@ class Enum(Simple):
         for the enum.
 
         '''
-        super(Enum, self).__init__(items=items, **kw)
+        self._items = items
+        super(Enum, self).__init__(**kw)
 
-    def _constructControl(self, items, **kw):
+    def _constructControl(self):
         '''Return the control widget.
 
         '''
         control = QtGui.QComboBox()
-        control.addItems(items)
+        control.addItem('Select')  # Title
+        control.addItems(self._items)
+        control.insertSeparator(1)
 
         return control
 
-    def _postConstruction(self, **kw):
+    def _postConstruction(self):
         '''Perform post-construction operations.'''
-        super(Enum, self)._postConstruction(**kw)
+        super(Enum, self)._postConstruction()
         self._control.currentIndexChanged.connect(self._emitValueChanged)
+
+    def setTitle(self, value):
+        '''Set title to *value*.'''
+        super(Enum, self).setTitle(value)
+        self._control.setItemText(0, 'Select {0}'.format(self._title))
 
     def value(self):
         '''Return current value.'''
+        if self._control.currentIndex() == 0:
+            return None
+
         return self._control.itemText(self._control.currentIndex())
 
     def setValue(self, value):
         '''Set current *value*.'''
-        index = self._control.findText(value)
+        if value is None:
+            index = 0
+        else:
+            index = self._control.findText(value)
+
         self._control.setCurrentIndex(index)
 
