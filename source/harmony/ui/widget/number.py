@@ -4,10 +4,10 @@
 
 from PySide import QtGui
 
-from .simple import Simple
+from .string import String
 
 
-class Number(Simple):
+class Number(String):
     '''Number input with fraction or exponent part.'''
 
     DEFAULT_RANGE = (-9999999.99, 9999999.99)
@@ -32,11 +32,15 @@ class Number(Simple):
     def _constructControl(self):
         '''Return the control widget.'''
         control = super(Number, self)._constructControl()
-        control.setValidator(
-            QtGui.QDoubleValidator(self._minimum, self._maximum, self)
-        )
+        validator = self._constructValidator()
+        if validator:
+            control.setValidator(validator)
 
         return control
+
+    def _constructValidator(self):
+        '''Return appropriate validator.'''
+        return QtGui.QDoubleValidator(self._minimum, self._maximum, self)
 
     def value(self):
         '''Return current value.'''
