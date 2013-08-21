@@ -13,6 +13,12 @@ class Text(String):
     def _constructControl(self):
         '''Return the control widget.'''
         control = TextEdit()
+
+        # Default to 5 lines high.
+        # TODO: Make this configurable?
+        font_metrics = QtGui.QFontMetrics(control.font())
+        control.setFixedHeight((font_metrics.lineSpacing() * 5) + 10)
+
         return control
 
 
