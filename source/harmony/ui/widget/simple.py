@@ -19,6 +19,7 @@ class Simple(Widget):
 
         self.layout().addWidget(self._control, stretch=1)
         self.layout().addWidget(self._errorIndicator)
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
     def _constructControl(self):
         '''Return the control widget.
