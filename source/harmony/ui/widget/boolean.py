@@ -1,0 +1,29 @@
+# :coding: utf-8
+# :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
+# :license: See LICENSE.txt.
+
+from PySide import QtGui
+
+from .simple import Simple
+
+
+class Boolean(Simple):
+    '''Boolean control.'''
+
+    def _constructControl(self, **kw):
+        '''Return the control widget.'''
+        return QtGui.QCheckBox()
+
+    def _postConstruction(self, **kw):
+        '''Perform post-construction operations.'''
+        super(Boolean, self)._postConstruction(**kw)
+        self._control.stateChanged.connect(self._emitValueChanged)
+
+    def value(self):
+        '''Return current value.'''
+        return self._control.isChecked()
+
+    def setValue(self, value):
+        '''Set current *value*.'''
+        self._control.setChecked(value)
+
