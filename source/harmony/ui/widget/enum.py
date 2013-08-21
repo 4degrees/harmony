@@ -39,7 +39,17 @@ class Enum(Simple):
     def setTitle(self, value):
         '''Set title to *value*.'''
         super(Enum, self).setTitle(value)
-        self._control.setItemText(0, 'Select {0}'.format(self._title))
+
+        placeholder = 'Select {0}'.format(self._title)
+        if not self.required():
+            placeholder += ' (optional)'
+
+        self._control.setItemText(0, placeholder)
+
+    def setRequired(self, value):
+        '''Set required status to boolean *value*.'''
+        super(Enum, self).setRequired(value)
+        self.setTitle(self.title())
 
     def value(self):
         '''Return current value.'''
