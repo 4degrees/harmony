@@ -4,6 +4,7 @@
 
 from .container import Container
 from .string import String
+from .text import Text
 from .enum import Enum
 from .integer import Integer
 from .number import Number
@@ -62,6 +63,12 @@ class Factory(object):
                    description=schema_description,
                    items=schema['enum']
                 )
+            elif schema.get('format', '') == 'text':
+                return Text(
+                    title=schema_title,
+                    description=schema_description
+                )
+
             else:
                 return String(
                     title=schema_title,
