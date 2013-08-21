@@ -47,8 +47,7 @@ class Container(Widget):
         self._childrenLayout = QtGui.QVBoxLayout()
 
         for child in self.children:
-            if child['widget']:
-                self._childrenLayout.addWidget(child['widget'])
+            self._childrenLayout.addWidget(child['widget'])
 
         self.layout().addLayout(self._childrenLayout, stretch=1)
 
