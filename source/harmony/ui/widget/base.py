@@ -4,6 +4,8 @@
 
 from PySide import QtGui, QtCore
 
+from .. import icon
+
 
 class Widget(QtGui.QFrame):
     '''Base widget.
@@ -69,10 +71,10 @@ class Widget(QtGui.QFrame):
     def setRequired(self, value):
         '''Set required status to boolean *value*.'''
         if value:
-            self._requiredIndicator.setPixmap(QtGui.QPixmap())
+            self._requiredIndicator.setPixmap(QtGui.QPixmap(':icon_star'))
             self._requiredIndicator.setToolTip('Required')
         else:
-            self._requiredIndicator.setPixmap(QtGui.QPixmap())
+            self._requiredIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
             self._requiredIndicator.setToolTip('')
 
     def error(self):
@@ -82,10 +84,10 @@ class Widget(QtGui.QFrame):
     def setError(self, value):
         '''Set error to *value*.'''
         if value:
-            self._errorIndicator.setPixmap(QtGui.QPixmap())
+            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
             self._errorIndicator.setToolTip(value)
         else:
-            self._errorIndicator.setPixmap(QtGui.QPixmap())
+            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
             self._errorIndicator.setToolTip('')
 
     def value(self):

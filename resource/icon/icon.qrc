@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file alias="icon_error">error.png</file>
+        <file alias="icon_ok">ok.png</file>
+        <file alias="icon_info">info.png</file>
+        <file alias="icon_star">star.png</file>
+        <file alias="icon_star_empty">star_empty.png</file>
+        <file alias="icon_star_half">star_half_full.png</file>
+        <file alias="icon_blank">blank.png</file>
+    </qresource>
+</RCC>
