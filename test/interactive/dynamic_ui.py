@@ -38,7 +38,6 @@ class Demo(QtGui.QDialog):
     def post_construction(self):
         '''Perform post-construction operations.'''
         self.setWindowTitle('Harmony UI Builder')
-        self.setMinimumSize(600, 800)
 
         self.schema_selector.currentIndexChanged.connect(self.on_select_schema)
 
@@ -126,6 +125,7 @@ def main(arguments=None):
 
     session = harmony.session.Session()
     dialog = Demo(session)
+    dialog.resize(600, 800)
     dialog.show()
 
     sys.exit(application.exec_())
