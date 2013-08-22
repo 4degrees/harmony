@@ -34,7 +34,7 @@
             "title": "Email Address",
             "description": "User's email address",
             "type": "string",
-            "pattern": ".+@.+\\..+",
+            "format": "email",
             "order": 5
         }
     },
