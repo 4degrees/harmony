@@ -5,6 +5,7 @@
 import sys
 
 from PySide import QtGui, QtCore
+import jsonpointer
 
 import harmony.session
 import harmony.ui.widget.factory
@@ -55,15 +56,65 @@ class Demo(QtGui.QDialog):
 
     def on_select_schema(self, index):
         '''Handle schema selection.'''
+        # Cleanup any existing schema widgets.
         existing_schema_details = self.schema_details_area.takeWidget()
         if existing_schema_details is not None:
             existing_schema_details.setParent(None)
             existing_schema_details.deleteLater()
 
+        # Construct new schema widgets.
         schema = self.schema_selector.itemData(index)
         schema_details = self.widget_factory(schema)
         schema_details.setRequired(True)
         self.schema_details_area.setWidget(schema_details)
+
+        # Connect dynamic validation.
+        schema_details.valueChanged.connect(self.on_value_changed)
+
+        # Construct initial data and set.
+        instance = self.session.instantiate(schema)
+        schema_details.setValue(instance)
+
+    def on_value_changed(self):
+        '''Handle change in value.'''
+        schema = self.schema_selector.itemData(
+            self.schema_selector.currentIndex()
+        )
+
+        if not schema:
+            return
+
+        instance = self.schema_details_area.widget().value()
+        self.validate(instance, schema)
+
+    def validate(self, instance, schema):
+        '''Validate *instance* against *schema* and update UI state.'''
+        # Validate
+        errors = self.session.validate(instance)
+
+        # Construct error tree that maps errors to UI structure.
+        error_tree = {}
+        for error in errors:
+            error_branch = error_tree
+
+            path = list(error.path)
+            path.insert(0, '__root__')
+
+            if error.validator == 'required':
+                # Required is set one level above so have to retrieve final
+                # path segment.
+                schema_path = '/' + '/'.join(map(str, error.schema_path))
+                segment = jsonpointer.resolve_pointer(
+                    error.schema, schema_path
+                )
+                path.append(segment)
+
+            for segment in path[:-1]:
+                error_branch = error_branch.setdefault(segment, {})
+
+            error_branch[path[-1]] = error.message
+
+        self.schema_details_area.widget().setError(error_tree['__root__'])
 
 
 def main(arguments=None):
