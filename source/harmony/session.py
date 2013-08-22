@@ -162,7 +162,11 @@ class Session(object):
                 schema = self.schemas.get(schema)
 
             validator = self.validator_class(schema)
-            errors.extend(list(validator.iter_errors(instance)))
+            validator_errors = list(validator.iter_errors(instance))
+            for error in validator_errors:
+                error.schema = schema
+
+            errors.extend(validator_errors)
 
         return errors
 
