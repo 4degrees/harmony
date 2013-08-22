@@ -61,6 +61,7 @@ class DateTimeEdit(QtGui.QDateTimeEdit):
         '''Set date time to *value*.'''
         if value is None:
             self._isNull = True
+            self.dateTimeChanged.emit(value)
         else:
             self._isNull = False
             super(DateTimeEdit, self).setDateTime(value)
@@ -76,6 +77,7 @@ class DateTimeEdit(QtGui.QDateTimeEdit):
         '''Set date to *value*.'''
         if value is None:
             self._isNull = True
+            self.dateChanged.emit(value)
         else:
             self._isNull = False
             super(DateTimeEdit, self).setDate(value)
@@ -91,6 +93,7 @@ class DateTimeEdit(QtGui.QDateTimeEdit):
         '''Set time to *value*.'''
         if value is None:
             self._isNull = True
+            self.timeChanged.emit(value)
         else:
             self._isNull = False
             super(DateTimeEdit, self).setTime(value)
