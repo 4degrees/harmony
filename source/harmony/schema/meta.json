@@ -207,6 +207,9 @@
         "oneOf": {
             "$ref": "#/definitions/schemaArray"
         },
+        "order": {
+            "type": "number"
+        },
         "pattern": {
             "format": "regex",
             "type": "string"
@@ -224,9 +227,6 @@
             },
             "default": {},
             "type": "object"
-        },
-        "propertyOrder": {
-            "$ref": "#/definitions/stringArray"
         },
         "required": {
             "$ref": "#/definitions/stringArray"

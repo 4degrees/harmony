@@ -23,21 +23,17 @@ class Factory(object):
         if schema_type == 'object':
             children = []
             properties = schema.get('properties', {})
-            property_order = schema.get('propertyOrder', [])
 
-            def order(name):
-                '''Order *name* by property_order or alphabetically.'''
-                try:
-                    return property_order.index(name)
-                except ValueError:
-                    return name
+            def order(item):
+                '''Order item by 'order' key else by name.'''
+                return item[1].get('order', item[0])
 
             required = schema.get('required')
             hide = ['harmony_type']
             disable = []
 
-            for name in sorted(properties, key=order):
-                child_widget = self(properties[name], options=options)
+            for name, subschema in sorted(properties.items(), key=order):
+                child_widget = self(subschema, options=options)
 
                 if name in required:
                     child_widget.setRequired(True)
