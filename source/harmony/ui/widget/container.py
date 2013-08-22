@@ -57,6 +57,14 @@ class Container(Widget):
 
         self.layout().setContentsMargins(5, 5, 5, 5)
 
+    def _postConstruction(self):
+        '''Perform post-construction operations.'''
+        # Relay child value changed signal.
+        for child in self.children:
+            child['widget'].valueChanged.connect(self._emitValueChanged)
+
+        super(Container, self)._postConstruction()
+
     def setTitle(self, value):
         '''Set title to *value*.'''
         super(Container, self).setTitle(value)
