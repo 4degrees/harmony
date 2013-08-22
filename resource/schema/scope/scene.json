@@ -1,0 +1,24 @@
+{
+    "id": "harmony:/scope/scene",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "Scene",
+    "description": "The scene.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/scope/scene$",
+            "default": "harmony:/scope/scene"
+        },
+        "id": {
+            "title": "Scene ID",
+            "description": "Unique identifier for the scene.",
+            "type": "string"
+        },
+        "name": {
+            "title": "Scene Name",
+            "description": "The display name for the scene.",
+            "type": "string"
+        }
+    },
+    "required": ["id", "name"]
+}

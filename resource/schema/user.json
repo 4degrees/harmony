@@ -1,0 +1,42 @@
+{
+    "id": "harmony:/user",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "User",
+    "description": "User information.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/user$",
+            "default": "harmony:/user"
+        },
+        "username": {
+            "title": "Username",
+            "description": "User's username",
+            "type": "string",
+            "pattern": ".+",
+            "order": 2
+        },
+        "firstname": {
+            "title": "First Name",
+            "description": "User's first name",
+            "type": "string",
+            "pattern": ".+",
+            "order": 3
+        },
+        "lastname": {
+            "title": "Last Name",
+            "description": "User's last name",
+            "type": "string",
+            "pattern": ".+",
+            "order": 4
+        },
+        "email": {
+            "title": "Email Address",
+            "description": "User's email address",
+            "type": "string",
+            "pattern": ".+@.+\\..+",
+            "order": 5
+        }
+    },
+    "required": ["username", "firstname", "lastname"]
+}

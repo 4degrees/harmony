@@ -1,0 +1,24 @@
+{
+    "id": "harmony:/scope/asset",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "Asset",
+    "description": "The asset.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/scope/asset$",
+            "default": "harmony:/scope/asset"
+        },
+        "id": {
+            "title": "Asset ID",
+            "description": "Unique identifier for the asset.",
+            "type": "string"
+        },
+        "name": {
+            "title": "Asset Name",
+            "description": "The display name for the asset.",
+            "type": "string"
+        }
+    },
+    "required": ["id", "name"]
+}

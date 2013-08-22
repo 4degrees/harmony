@@ -1,0 +1,22 @@
+{
+    "id": "harmony:/domain/shot",
+    "$mixin": {"$ref": "harmony:/domain"},
+    "title": "Domain",
+    "description": "Shot level domain.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/domain/shot$",
+            "default": "harmony:/domain/shot"
+        },
+         "scene": {
+            "$mixin": {"$ref": "harmony:/scope/scene"},
+            "order": 3
+        },
+        "shot": {
+            "$mixin": {"$ref": "harmony:/scope/shot"},
+            "order": 4
+        }
+    },
+    "required": ["scene", "shot"]
+}

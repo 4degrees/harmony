@@ -1,0 +1,47 @@
+{
+    "id": "harmony:/item/model",
+    "$mixin": {
+        "$ref": "harmony:/item",
+        "hints": {
+            "/properties/department/enum": "preserve"
+        }
+    },
+    "title": "Model",
+    "description": "A model.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/item/model$",
+            "default": "harmony:/item/model"
+        },
+        "department": {
+            "enum": [
+                "Model",
+                "Lookdev"
+            ]
+        },
+        "domain": {
+            "$mixin": {"$ref": "harmony:/domain/asset"}
+        },
+        "lod": {
+            "title": "LOD",
+            "description": "Level of detail",
+            "type": "string",
+            "enum": [
+                "Highest",
+                "High",
+                "Medium",
+                "Low",
+                "Lowest"
+            ],
+            "order": 8.5
+        },
+        "variation": {
+            "title": "Variation",
+            "description": "Model variation.",
+            "type": "string",
+            "order": 8.6
+        }
+    },
+    "required": ["lod", "variation"]
+}

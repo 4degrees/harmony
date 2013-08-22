@@ -1,0 +1,77 @@
+{
+    "id": "harmony:/item",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "Item",
+    "description": "Common item properties.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/item.*$",
+            "default": "harmony:/item"
+        },
+        "id": {
+            "title": "ID",
+            "description": "Unique identifier.",
+            "type": "string",
+            "order": 2
+        },
+        "author": {
+            "$mixin": {"$ref": "harmony:/user"},
+            "title": "Author",
+            "description": "Creator of the item.",
+            "order": 3
+        },
+        "created": {
+            "title": "Created",
+            "description": "Date and time of creation.",
+            "type": "string",
+            "format": "date-time",
+            "order": 4
+        },
+        "department": {
+            "title": "Department",
+            "description": "Originating department for item.",
+            "type": "string",
+            "enum": [
+                "Model",
+                "Texture",
+                "Rig",
+                "Lookdev",
+                "Matchmove",
+                "Layout",
+                "Animation",
+                "Light",
+                "Fx",
+                "Comp"
+            ],
+            "order": 6
+        },
+        "domain": {
+            "$mixin": {"$ref": "harmony:/domain"},
+            "order": 8
+        },
+        "modified": {
+            "title": "Last Modified",
+            "description": "Date and time of last modification.",
+            "type": "string",
+            "format": "date-time",
+            "order": 5
+        },
+        "note": {
+            "title": "Note",
+            "description": "Additional information from author.",
+            "type": "string",
+            "format": "text",
+            "order": 7
+        },
+        "version": {
+            "title": "Version",
+            "description": "Version of the item.",
+            "type": "integer",
+            "pattern": "^\\d{3}$",
+            "default": "000",
+            "order": 9
+        }
+    },
+    "required": ["author", "created", "domain", "version"]
+}

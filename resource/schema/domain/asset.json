@@ -1,0 +1,18 @@
+{
+    "id": "harmony:/domain/asset",
+    "$mixin": {"$ref": "harmony:/domain"},
+    "title": "Domain",
+    "description": "Asset level domain.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/domain/asset$",
+            "default": "harmony:/domain/asset"
+        },
+        "asset": {
+            "$mixin": {"$ref": "harmony:/scope/asset"},
+            "order": 5
+        }
+    },
+    "required": ["asset"]
+}

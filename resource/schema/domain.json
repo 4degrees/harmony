@@ -1,0 +1,18 @@
+{
+    "id": "harmony:/domain",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "Domain",
+    "description": "Domain information.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/domain$",
+            "default": "harmony:/domain"
+        },
+        "show": {
+            "$mixin": {"$ref": "harmony:/scope/show"},
+            "order": 2
+        }
+    },
+    "required": ["show"]
+}

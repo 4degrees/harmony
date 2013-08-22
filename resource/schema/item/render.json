@@ -1,0 +1,38 @@
+{
+    "id": "harmony:/item/render",
+    "$mixin": {
+        "$ref": "harmony:/item",
+        "hints": {
+            "/properties/department/enum": "preserve"
+        }
+    },
+    "title": "Render",
+    "description": "A render.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/item/render$",
+            "default": "harmony:/item/render"
+        },
+        "department": {
+            "enum": [
+                "Model",
+                "Texture",
+                "Lookdev",
+                "Layout",
+                "Animation",
+                "Light",
+                "Fx",
+                "Comp"
+            ]
+        },
+        "domain": {
+            "$mixin": {"$ref": "harmony:/domain/shot"}
+        },
+        "resolution": {
+            "$mixin": {"$ref": "harmony:/resolution"},
+            "order": 8.4
+        }
+    },
+    "required": ["resolution"]
+}
