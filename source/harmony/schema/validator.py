@@ -12,6 +12,7 @@ except ImportError:
         raise ImportError('Could not import json or simplejson')
 
 import jsonschema.validators
+from jsonschema import draft4_format_checker as format_checker
 
 
 # Custom validators
@@ -30,7 +31,7 @@ def _required(validator, required, instance, schema):
 
 
 # Construct validator as extension of Json Schema Draft 4.
-Validator = jsonschema.validators.extend(
+_Validator = jsonschema.validators.extend(
     validator=jsonschema.validators.Draft4Validator,
     validators={
         'required': _required
@@ -42,5 +43,14 @@ meta_schema_path = os.path.join(os.path.dirname(__file__), 'meta.json')
 with open(meta_schema_path, 'r') as file_handler:
     meta_schema = json.load(file_handler)
 
-Validator.META_SCHEMA = meta_schema
+_Validator.META_SCHEMA = meta_schema
 
+
+class Validator(_Validator):
+    '''Schema validator.'''
+
+    def __init__(self, *args, **kw):
+        '''Initialise validator.'''
+        super(Validator, self).__init__(*args, **kw)
+        if self.format_checker is None:
+            self.format_checker = jsonschema.draft4_format_checker
