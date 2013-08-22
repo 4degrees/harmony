@@ -80,6 +80,38 @@ class Container(Widget):
         super(Container, self).setRequired(value)
         self.setTitle(self.title())
 
+    def setError(self, value):
+        '''Set error to *value*.
+
+        *value* can be either a dictionary or a string.
+
+        If *value* is a dictionary then each key should correspond to the name
+        of a child of this container and that key's value the error to set for
+        the child.
+
+        If *value* is a string it will be displayed at the container level.
+
+        '''
+        self._error = value
+
+        if isinstance(value, basestring):
+            if value:
+                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
+                self._errorIndicator.setToolTip(value)
+            else:
+                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
+                self._errorIndicator.setToolTip('')
+
+        else:
+            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
+            self._errorIndicator.setToolTip('')
+            if value is None:
+                value = {}
+
+            for child in self.children:
+                child_error = value.get(child['name'], None)
+                child['widget'].setError(child_error)
+
     def value(self):
         '''Return current value.
 
