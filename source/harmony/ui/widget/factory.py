@@ -20,8 +20,10 @@ class Factory(object):
         schema_type = schema.get('type')
         schema_title = schema.get('title')
         schema_description = schema.get('description')
+        schema_id = schema.get('id', '')
 
         if schema_type == 'object':
+            # Construct child for each property.
             children = []
             properties = schema.get('properties', {})
 
@@ -47,10 +49,17 @@ class Factory(object):
 
                 children.append({'name': name, 'widget': child_widget})
 
+            # Determine columns in layout.
+            columns = 1
+            if (schema_id in ('harmony:/user', 'harmony:/resolution')
+                or schema_id.startswith('harmony:/scope/')):
+                columns = 2
+
             return Container(
                 title=schema_title,
                 description=schema_description,
-                children=children
+                children=children,
+                columns=columns
             )
 
         if schema_type == 'string':

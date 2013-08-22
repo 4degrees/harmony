@@ -10,7 +10,7 @@ from .base import Widget
 class Container(Widget):
     '''Group together several related widgets.'''
 
-    def __init__(self, children, **kw):
+    def __init__(self, children, columns=1, **kw):
         '''Initialise widget with *children*.
 
         *children* should be list of dictionaries. Each dictionary should
@@ -22,6 +22,7 @@ class Container(Widget):
 
         '''
         self.children = children
+        self._columns = columns
         super(Container, self).__init__(**kw)
 
     def _construct(self):
@@ -44,10 +45,16 @@ class Container(Widget):
 
         self.layout().addWidget(self._header, stretch=0)
 
-        self._childrenLayout = QtGui.QVBoxLayout()
+        # Layout children
+        self._childrenLayout = QtGui.QGridLayout()
 
-        for child in self.children:
-            self._childrenLayout.addWidget(child['widget'])
+        row = 0
+        for index, child in enumerate(self.children):
+            column = index % self._columns
+            self._childrenLayout.addWidget(child['widget'], row, column)
+
+            if column == self._columns - 1:
+                row += 1
 
         self.layout().addLayout(self._childrenLayout, stretch=1)
 
