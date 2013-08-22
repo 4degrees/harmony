@@ -14,7 +14,6 @@ class DateTime(Simple):
         '''Return the control widget.'''
         control = DateTimeEdit()
         control.setCalendarPopup(True)
-        control.setSpecialValueText('NOW')
         return control
 
     def _postConstruction(self):
