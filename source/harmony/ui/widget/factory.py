@@ -5,6 +5,7 @@
 from .container import Container
 from .string import String
 from .text import Text
+from .datetime import DateTime
 from .enum import Enum
 from .integer import Integer
 from .number import Number
@@ -64,7 +65,11 @@ class Factory(object):
                     title=schema_title,
                     description=schema_description
                 )
-
+            elif schema.get('format', '') == 'date-time':
+                return DateTime(
+                    title=schema_title,
+                    description=schema_description
+                )
             else:
                 return String(
                     title=schema_title,
