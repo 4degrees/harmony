@@ -40,10 +40,16 @@ class DateTime(Simple):
     def value(self):
         '''Return current value.'''
         value = self._control.dateTime()
-        return value
+        if value is None:
+            return value
+
+        return value.toString(QtCore.Qt.ISODate)
 
     def setValue(self, value):
         '''Set current *value*.'''
+        if value is not None:
+            value = QtCore.QDateTime.fromString(value, QtCore.Qt.ISODate)
+
         self._control.setDateTime(value)
 
 
