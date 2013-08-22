@@ -21,6 +21,6 @@ class Integer(Number):
         value = super(Integer, self).value()
         try:
             return int(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 

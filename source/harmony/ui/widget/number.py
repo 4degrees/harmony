@@ -47,7 +47,7 @@ class Number(String):
         value = super(Number, self).value()
         try:
             return float(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     def setValue(self, value):
