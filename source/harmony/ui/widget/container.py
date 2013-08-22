@@ -76,11 +76,11 @@ class Container(Widget):
         '''Set title to *value*.'''
         super(Container, self).setTitle(value)
 
-        placeholder = self._title
-        if not self.required():
-            placeholder += ' (optional)'
+        title = self._title
+        if self.required():
+            title += '*'
 
-        self._titleLabel.setText(placeholder)
+        self._titleLabel.setText(title)
 
     def setRequired(self, value):
         '''Set required status to boolean *value*.'''

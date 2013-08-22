@@ -22,21 +22,6 @@ class DateTime(Simple):
         super(DateTime, self)._postConstruction()
         self._control.dateTimeChanged.connect(self._emitValueChanged)
 
-    def setTitle(self, value):
-        '''Set title to *value*.'''
-        super(DateTime, self).setTitle(value)
-
-        placeholder = self._title
-        if not self.required():
-            placeholder += ' (optional)'
-
-        self._control.setPlaceholderText(placeholder)
-
-    def setRequired(self, value):
-        '''Set required status to boolean *value*.'''
-        super(DateTime, self).setRequired(value)
-        self.setTitle(self.title())
-
     def value(self):
         '''Return current value.'''
         value = self._control.dateTime()

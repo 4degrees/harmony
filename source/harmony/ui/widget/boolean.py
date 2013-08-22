@@ -25,11 +25,6 @@ class Boolean(Simple):
         super(Boolean, self)._postConstruction()
         self._control.stateChanged.connect(self._emitValueChanged)
 
-    def setTitle(self, value):
-        '''Set title to *value*.'''
-        super(Boolean, self).setTitle(value)
-        self._control.setText(self._title)
-
     def value(self):
         '''Return current value.'''
         return self._control.isChecked()

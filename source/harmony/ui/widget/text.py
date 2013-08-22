@@ -10,6 +10,13 @@ from .string import String
 class Text(String):
     '''Multiple line text based input.'''
 
+    def _construct(self):
+        '''Construct widget.'''
+        super(Text, self)._construct()
+        self._titleLabel.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
+        )
+
     def _constructControl(self):
         '''Return the control widget.'''
         control = TextEdit()
