@@ -37,16 +37,21 @@ class Demo(QtGui.QDialog):
     def post_construction(self):
         '''Perform post-construction operations.'''
         self.setWindowTitle('Harmony UI Builder')
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(600, 800)
 
         self.schema_selector.currentIndexChanged.connect(self.on_select_schema)
 
-        schema_ids = set()
+        # Filter schemas
+        schemas = []
         for schema in self.session.schemas:
-            schema_ids.add(schema.get('id'))
+            if schema.get('id', '').startswith('harmony:/item/'):
+                schemas.append(schema)
 
-        for schema_id in sorted(schema_ids):
-            self.schema_selector.addItem(schema_id)
+        for schema in sorted(schemas):
+            self.schema_selector.addItem(
+                schema.get('title', schema['id']),
+                schema
+            )
 
     def on_select_schema(self, index):
         '''Handle schema selection.'''
@@ -55,10 +60,9 @@ class Demo(QtGui.QDialog):
             existing_schema_details.setParent(None)
             existing_schema_details.deleteLater()
 
-        selected_schema_id = self.schema_selector.itemText(index)
-        schema = self.session.schemas.get(selected_schema_id)
-
+        schema = self.schema_selector.itemData(index)
         schema_details = self.widget_factory(schema)
+        schema_details.setRequired(True)
         self.schema_details_area.setWidget(schema_details)
 
 
