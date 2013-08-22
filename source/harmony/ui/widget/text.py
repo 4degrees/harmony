@@ -29,6 +29,7 @@ class TextEdit(QtGui.QPlainTextEdit):
         '''Initialise text edit.'''
         self._placeholderText = ''
         super(TextEdit, self).__init__(*args, **kw)
+        self.setTabChangesFocus(True)
 
     def placeholderText(self):
         '''Return placeholder text.'''
