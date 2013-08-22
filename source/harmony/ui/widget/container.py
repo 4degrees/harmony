@@ -37,6 +37,9 @@ class Container(Widget):
         self._header.setLayout(QtGui.QHBoxLayout())
 
         self._titleLabel = QtGui.QLabel()
+        font = QtGui.QFont(self._titleLabel.font())
+        font.setBold(True)
+        self._titleLabel.setFont(font)
 
         self._header.layout().addWidget(self._titleLabel, stretch=0)
         self._header.layout().addStretch(1)
