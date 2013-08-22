@@ -38,6 +38,7 @@ class Widget(QtGui.QFrame):
         self.setTitle(self._title)
         self.setDescription(self._description)
         self.setRequired(self._required)
+        self.setError('')
 
     def _emitValueChanged(self, *args, **kw):
         '''Emit valueChanged signal.
@@ -87,7 +88,11 @@ class Widget(QtGui.QFrame):
             self._errorIndicator.setToolTip('')
 
     def value(self):
-        '''Return current value.'''
+        '''Return current value.
+
+        Return None if value should be considered as not set.
+
+        '''
         raise NotImplementedError()
 
     def setValue(self, value):

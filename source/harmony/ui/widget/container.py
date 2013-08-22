@@ -71,3 +71,44 @@ class Container(Widget):
         '''Set required status to boolean *value*.'''
         super(Container, self).setRequired(value)
         self.setTitle(self.title())
+
+    def value(self):
+        '''Return current value.
+
+        Combine all child values into a dictionary keyed by the child name as
+        passed in self.children.
+
+        Do not include child values that are None to help ensure validation
+        errors are not misleading.
+
+        '''
+        value = {}
+
+        for child in self.children:
+            child_value = child['widget'].value()
+
+            # Ignore None values
+            if child_value is None:
+                continue
+
+            value[child['name']] = child_value
+
+        return value
+
+    def setValue(self, value):
+        '''Set current *value*.
+
+        *value* must be a dictionary with each key corresponding to the name
+        of a child of this container and that key's value the value to set for
+        the child.
+
+        '''
+        children_by_name = {}
+        for child in self.children:
+            children_by_name[child['name']] = child['widget']
+
+        for child_name, child_value in value.items():
+            child = children_by_name.get(child_name)
+            if child:
+                child.setValue(child_value)
+

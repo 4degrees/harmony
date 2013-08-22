@@ -37,8 +37,14 @@ class String(Simple):
 
     def value(self):
         '''Return current value.'''
-        return self._control.text()
+        value = self._control.text()
+        value = value.strip()
+        if not value:
+            value = None
+
+        return value
 
     def setValue(self, value):
         '''Set current *value*.'''
         self._control.setText(value)
+
