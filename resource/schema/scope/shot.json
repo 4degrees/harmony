@@ -12,12 +12,14 @@
         "id": {
             "title": "Shot ID",
             "description": "Unique identifier for the shot.",
-            "type": "string"
+            "type": "string",
+            "order": 1
         },
         "name": {
             "title": "Shot Name",
             "description": "The display name for the shot.",
-            "type": "string"
+            "type": "string",
+            "order": 2
         }
     },
     "required": ["id", "name"]

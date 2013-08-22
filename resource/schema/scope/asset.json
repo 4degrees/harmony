@@ -12,12 +12,14 @@
         "id": {
             "title": "Asset ID",
             "description": "Unique identifier for the asset.",
-            "type": "string"
+            "type": "string",
+            "order": 1
         },
         "name": {
             "title": "Asset Name",
             "description": "The display name for the asset.",
-            "type": "string"
+            "type": "string",
+            "order": 2
         }
     },
     "required": ["id", "name"]

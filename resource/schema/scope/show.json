@@ -12,12 +12,14 @@
         "id": {
             "title": "Show ID",
             "description": "Unique identifier for the show.",
-            "type": "string"
+            "type": "string",
+            "order": 1
         },
         "name": {
             "title": "Show Name",
             "description": "The display name for the show.",
-            "type": "string"
+            "type": "string",
+            "order": 2
         }
     },
     "required": ["id", "name"]

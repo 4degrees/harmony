@@ -8,8 +8,7 @@
             "title": "Harmony Type",
             "description": "Reference to a governing schema id.",
             "type": "string",
-            "pattern": "^harmony:/.+$",
-            "order": 1
+            "pattern": "^harmony:/.+$"
         }
     },
     "required": ["harmony_type"]

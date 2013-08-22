@@ -14,28 +14,28 @@
             "description": "User's username",
             "type": "string",
             "pattern": ".+",
-            "order": 2
+            "order": 3
         },
         "firstname": {
             "title": "First Name",
             "description": "User's first name",
             "type": "string",
             "pattern": ".+",
-            "order": 3
+            "order": 1
         },
         "lastname": {
             "title": "Last Name",
             "description": "User's last name",
             "type": "string",
             "pattern": ".+",
-            "order": 4
+            "order": 2
         },
         "email": {
             "title": "Email Address",
             "description": "User's email address",
             "type": "string",
             "format": "email",
-            "order": 5
+            "order": 4
         }
     },
     "required": ["username", "firstname", "lastname"]
