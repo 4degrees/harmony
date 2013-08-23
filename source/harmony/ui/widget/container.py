@@ -28,7 +28,7 @@ class Container(Widget):
     def _construct(self):
         '''Construct the interface.'''
         super(Container, self)._construct()
-        self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Sunken)
+        self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
         self.setLineWidth(1)
 
         self.setLayout(QtGui.QVBoxLayout())
@@ -161,4 +161,3 @@ class Container(Widget):
             child = children_by_name.get(child_name)
             if child:
                 child.setValue(child_value)
-

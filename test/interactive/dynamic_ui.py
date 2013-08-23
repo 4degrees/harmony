@@ -65,6 +65,13 @@ class Demo(QtGui.QDialog):
         schema = self.schema_selector.itemData(index)
         schema_details = self.widget_factory(schema)
         schema_details.setRequired(True)
+        schema_details.setContentsMargins(5, 5, 5, 5)
+        schema_details.setFrameStyle(QtGui.QFrame.NoFrame)
+
+        self.schema_details_area.setFrameStyle(
+            QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain
+        )
+
         self.schema_details_area.setWidget(schema_details)
 
         # Connect dynamic validation.
