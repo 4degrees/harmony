@@ -72,25 +72,32 @@ class Factory(object):
 
         if schema_type == 'array':
             items = schema.get('items', [])
-            if not isinstance(items, list):
-                items = [items]
+            if isinstance(items, dict):
+                additional_item = items
+                items = []
+            else:
+                additional_item = schema.get('additionalItems', None)
 
             types = []
             for subschema in items:
-                widget_constructor = partial(self, subschema, options=options)
-                initial_value = self.session.instantiate(subschema)
-
                 types.append({
-                    'id': subschema['id'],
-                    'name': subschema.get('title'),
-                    'constructor': widget_constructor,
-                    'value': initial_value
+                    'constructor': partial(self, subschema, options=options),
+                    'value': self.session.instantiate(subschema)
                 })
+
+            additional_type = None
+            if additional_item is not None:
+                additional_type = {
+                    'constructor': partial(self, additional_item,
+                                           options=options),
+                    'value': self.session.instantiate(additional_item)
+                }
 
             return Array(
                 title=schema_title,
                 description=schema_description,
-                types=types
+                types=types,
+                additionalType=additional_type
             )
 
         if schema_type == 'string':

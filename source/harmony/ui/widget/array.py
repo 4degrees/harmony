@@ -10,20 +10,24 @@ from .base import Widget
 class Array(Widget):
     '''Represent a list of items with controls for addition and removal.'''
 
-    def __init__(self, types, **kw):
+    def __init__(self, types, additionalType=None, **kw):
         '''Initialise widget with valid *types*.
 
         *types* should be list of dictionaries. Each dictionary should
         have the following keys:
 
-            * id - Id of schema. Used to map set values to new widgets.
-            * name - Required name to key the type under. This value will
-                     be displayed in the type selector when adding an item.
             * constructor - Required callable to return a widget instance.
             * value - Optional initial value to set on the constructed widget.
 
+        Each index in the types list will direct the type of item to expect
+        or create at the same index in the managed list.
+
+        *additionalType* can be a dictionary (as per an entry in *types*) that
+        specifies how to handle all additional items.
+
         '''
         self._types = types
+        self._additionalType = additionalType
         super(Array, self).__init__(**kw)
 
     def _construct(self):
@@ -75,10 +79,6 @@ class Array(Widget):
         self._footer.setLayout(QtGui.QHBoxLayout())
         self._footer.layout().addStretch(1)
 
-        self._typeSelector = QtGui.QComboBox()
-        self._typeSelector.setToolTip('Select type of item to add.')
-        self._footer.layout().addWidget(self._typeSelector)
-
         self._addButton = QtGui.QPushButton('Add')
         self._addButton.setToolTip('Add a new item to the list.')
         plusIcon = QtGui.QPixmap(':icon_plus')
@@ -105,24 +105,14 @@ class Array(Widget):
         '''Perform post-construction operations.'''
         super(Array, self)._postConstruction()
 
-        self._addButton.setDisabled(True)
         self._removeButton.setDisabled(True)
 
         # Connect signals
-        self._typeSelector.currentIndexChanged.connect(self.onTypeSelected)
         self._addButton.clicked.connect(self.onAddButtonClick)
         self._removeButton.clicked.connect(self.onRemoveButtonClick)
 
         selectionModel = self._itemList.selectionModel()
         selectionModel.selectionChanged.connect(self.onSelectionChanged)
-
-        # Update type selector
-        for item in self._types:
-            self._typeSelector.addItem(item['name'], item)
-
-    def onTypeSelected(self, index):
-        '''Handle type selection.'''
-        self._addButton.setEnabled(True)
 
     def onSelectionChanged(self, selected, deselected):
         '''Handle change in selection of items.'''
@@ -135,19 +125,8 @@ class Array(Widget):
 
     def onAddButtonClick(self):
         '''Handle add button click.'''
-        item = self._typeSelector.itemData(
-            self._typeSelector.currentIndex()
-        )
-        widget = item['constructor']()
-        if 'value' in item:
-            widget.setValue(item['value'])
-
-        widget.valueChanged.connect(self._emitValueChanged)
-
         row = self._itemList.rowCount()
-        self._itemList.insertRow(row)
-        self._itemList.setCellWidget(row, 0, widget)
-
+        self._addItem(row)
         self._emitValueChanged()
 
     def onRemoveButtonClick(self):
@@ -244,23 +223,27 @@ class Array(Widget):
             value = []
 
         for row, item_value in enumerate(value):
-            match = None
-            for item in self._types:
-                if item['id'] == item_value.get('harmony_type', ''):
-                    match = item
-                    break
+            self._addItem(row, item_value)
 
-            if not match:
-                raise ValueError('Could not set value as no matching widget '
-                                 'constructor found.')
+        self._emitValueChanged()
 
-            widget = match['constructor']()
-            widget.valueChanged.connect(self._emitValueChanged)
+    def _addItem(self, row, value=None):
+        '''Add an appropriate item at *row* with *value*.'''
+        try:
+            item = self._types[row]
+        except IndexError:
+            item = self._additionalType
 
-            row = self._itemList.rowCount()
-            self._itemList.insertRow(row)
-            self._itemList.setCellWidget(row, 0, widget)
+        widget = item['constructor']()
 
-            widget.setValue(item_value)
+        if value is not None:
+            widget.setValue(value)
 
+        elif 'value' in item:
+            widget.setValue(item['value'])
+
+        widget.valueChanged.connect(self._emitValueChanged)
+
+        self._itemList.insertRow(row)
+        self._itemList.setCellWidget(row, 0, widget)
 
