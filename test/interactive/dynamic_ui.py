@@ -122,7 +122,9 @@ class Demo(QtGui.QDialog):
 
             error_branch[path[-1]] = error.message
 
-        self.schema_details_area.widget().setError(error_tree['__root__'])
+        self.schema_details_area.widget().setError(
+            error_tree.get('__root__', None)
+        )
 
 
 def main(arguments=None):
