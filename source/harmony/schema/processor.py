@@ -84,6 +84,9 @@ class MixinProcessor(Processor):
                 self._process(value, schemas)
 
         items = fragment.get('items', [])
+        if isinstance(items, dict):
+            items = [items]
+
         for item in items:
             if isinstance(item, dict):
                 self._process(item, schemas)
