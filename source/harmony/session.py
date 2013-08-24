@@ -144,8 +144,11 @@ class Session(object):
             return errors
 
         # Validate against additional schemas if required.
-        errors = self._validate(instance, additional_schemas)
-        return errors
+        if additional_schemas is not None:
+            errors = self._validate(instance, additional_schemas)
+            return errors
+
+        return []
 
     def _validate(self, instance, schemas):
         '''Validate *instance* against *schemas*.
