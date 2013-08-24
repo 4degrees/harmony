@@ -81,6 +81,7 @@ class Factory(object):
                 initial_value = self.session.instantiate(subschema)
 
                 types.append({
+                    'id': subschema['id'],
                     'name': subschema.get('title'),
                     'constructor': widget_constructor,
                     'value': initial_value

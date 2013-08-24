@@ -16,6 +16,7 @@ class Array(Widget):
         *types* should be list of dictionaries. Each dictionary should
         have the following keys:
 
+            * id - Id of schema. Used to map set values to new widgets.
             * name - Required name to key the type under. This value will
                      be displayed in the type selector when adding an item.
             * constructor - Required callable to return a widget instance.
@@ -224,13 +225,38 @@ class Array(Widget):
     def setValue(self, value):
         '''Set current *value*.
 
-        *value* should be a list of values to be displayed / updated in this
+        *value* should be a list of values to be displayed in this
         widgets item list.
 
+        .. note::
+
+            Will first remove all existing rows.
+
         '''
+        self._itemList.clear()
+        self._itemList.setRowCount(0)
+
         if value is None:
             value = []
 
         for row, item_value in enumerate(value):
-            widget = self._itemList.cellWidget(row, 0)
+            match = None
+            for item in self._types:
+                if item['id'] == item_value.get('harmony_type', ''):
+                    match = item
+                    break
+
+            if not match:
+                raise ValueError('Could not set value as no matching widget '
+                                 'constructor found.')
+
+            widget = match['constructor']()
+            widget.valueChanged.connect(self._emitValueChanged)
+
+            row = self._itemList.rowCount()
+            self._itemList.insertRow(row)
+            self._itemList.setCellWidget(row, 0, widget)
+
             widget.setValue(item_value)
+
+
