@@ -2,6 +2,8 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
+from functools import partial
+
 from .container import Container
 from .string import String
 from .text import Text
@@ -10,10 +12,16 @@ from .enum import Enum
 from .integer import Integer
 from .number import Number
 from .boolean import Boolean
+from .array import Array
 
 
 class Factory(object):
     '''Manage constructing widgets for schemas.'''
+
+    def __init__(self, session):
+        '''Initialise factory with *session*.'''
+        super(Factory, self).__init__()
+        self.session = session
 
     def __call__(self, schema, options=None):
         '''Return an appropriate widget for *schema*.'''
@@ -60,6 +68,28 @@ class Factory(object):
                 description=schema_description,
                 children=children,
                 columns=columns
+            )
+
+        if schema_type == 'array':
+            items = schema.get('items', [])
+            if not isinstance(items, list):
+                items = [items]
+
+            types = []
+            for subschema in items:
+                widget_constructor = partial(self, subschema, options=options)
+                initial_value = self.session.instantiate(subschema)
+
+                types.append({
+                    'name': subschema.get('title'),
+                    'constructor': widget_constructor,
+                    'value': initial_value
+                })
+
+            return Array(
+                title=schema_title,
+                description=schema_description,
+                types=types
             )
 
         if schema_type == 'string':

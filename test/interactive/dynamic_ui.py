@@ -19,7 +19,9 @@ class Demo(QtGui.QDialog):
         super(Demo, self).__init__(parent=parent)
 
         self.session = session
-        self.widget_factory = harmony.ui.widget.factory.Factory()
+        self.widget_factory = harmony.ui.widget.factory.Factory(
+            self.session
+        )
 
         self.construct()
         self.post_construction()

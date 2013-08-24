@@ -7,5 +7,7 @@
         <file alias="icon_star_empty">star_empty.png</file>
         <file alias="icon_star_half">star_half_full.png</file>
         <file alias="icon_blank">blank.png</file>
+        <file alias="icon_plus">plus.png</file>
+        <file alias="icon_minus">minus.png</file>
     </qresource>
 </RCC>
