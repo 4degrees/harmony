@@ -91,6 +91,10 @@ class MixinProcessor(Processor):
             if isinstance(item, dict):
                 self._process(item, schemas)
 
+        additional_items = fragment.get('additionalItems')
+        if additional_items and isinstance(additional_items, dict):
+            self._process(additional_items, schemas)
+
         # Process mixin directives
         mixins = fragment.pop('$mixin', None)
         if not mixins:
