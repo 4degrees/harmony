@@ -28,6 +28,15 @@
             "format": "date-time",
             "order": 4
         },
+        "data": {
+            "title": "Data",
+            "description": "Data associated with this item, such as a file.",
+            "type": "array",
+            "order": 1,
+            "items": {
+                "$mixin": {"$ref": "harmony:/datum"}
+            }
+        },
         "department": {
             "title": "Department",
             "description": "Originating department for item.",

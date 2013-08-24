@@ -1,0 +1,26 @@
+{
+    "id": "harmony:/datum",
+    "$mixin": {"$ref": "harmony:/base"},
+    "title": "Datum",
+    "description": "Represent an item of data.",
+    "type": "object",
+    "properties": {
+        "harmony_type": {
+            "pattern": "^harmony:/datum$",
+            "default": "harmony:/datum"
+        },
+        "label": {
+            "type": "string",
+            "title": "Label",
+            "description": "High level classifier.",
+            "order": 1
+        },
+        "path": {
+            "type": "string",
+            "title": "Path",
+            "description": "Path to the data.",
+            "order": 2
+        }
+    },
+    "required": ["label", "path"]
+}
