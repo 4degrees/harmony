@@ -2,7 +2,7 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 from .base import Widget
 
@@ -81,12 +81,16 @@ class Array(Widget):
 
         self._addButton = QtGui.QPushButton('Add')
         self._addButton.setToolTip('Add a new item to the list.')
-        self._addButton.setIcon(QtGui.QPixmap(':icon_plus'))
+        plusIcon = QtGui.QPixmap(':icon_plus')
+        self._addButton.setIcon(plusIcon)
+        self._addButton.setIconSize(plusIcon.size())
         self._footer.layout().addWidget(self._addButton)
 
         self._removeButton = QtGui.QPushButton('Remove')
         self._removeButton.setToolTip('Remove selected items from list.')
-        self._removeButton.setIcon(QtGui.QPixmap(':icon_minus'))
+        minusIcon = QtGui.QPixmap(':icon_minus')
+        self._removeButton.setIcon(minusIcon)
+        self._removeButton.setIconSize(minusIcon.size())
         self._footer.layout().addWidget(self._removeButton)
 
         self._footer.layout().setContentsMargins(0, 0, 0, 0)
