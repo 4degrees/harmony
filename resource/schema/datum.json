@@ -13,6 +13,7 @@
             "type": "string",
             "title": "Label",
             "description": "High level classifier.",
+            "enum": ["Main"],
             "order": 1
         },
         "path": {

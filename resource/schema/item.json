@@ -33,8 +33,38 @@
             "description": "Data associated with this item, such as a file.",
             "type": "array",
             "order": 1,
-            "items": {
-                "$mixin": {"$ref": "harmony:/datum"}
+            "items": [{
+                "$mixin": {
+                    "$ref": "harmony:/datum",
+                    "hints": {
+                        "/properties/label/enum": "preserve"
+                    }
+                },
+                "properties": {
+                    "label": {
+                        "enum": ["Main"]
+                    }
+                }
+            }],
+            "additionalItems": {
+                "$mixin": {
+                    "$ref": "harmony:/datum",
+                    "hints": {
+                        "/properties/label/enum": "preserve"
+                    }
+                },
+                "properties": {
+                    "label": {
+                        "enum": [
+                            "Maya Scene",
+                            "Houdini Scene",
+                            "Nuke Script",
+                            "Alembic Archive",
+                            "Image Sequence",
+                            "Turntable"
+                        ]
+                    }
+                }
             }
         },
         "department": {
@@ -80,7 +110,11 @@
             "pattern": "^\\d{3}$",
             "default": "000",
             "order": 9
+        },
+        "foo": {
+            "type": "boolean",
+            "title": "Foo"
         }
     },
-    "required": ["author", "created", "domain", "version"]
+    "required": ["author", "created", "domain", "version", "foo"]
 }
