@@ -4,22 +4,22 @@
 
 from PySide import QtGui
 
+from ..model.placeholder_proxy_model import PlaceholderProxyModel
 from .simple import Simple
 
 
 class Enum(Simple):
     '''Enumerated string option.'''
 
-    def __init__(self, items=None, **kw):
+    def __init__(self, model, **kw):
         '''Initialise widget.
 
-        *items* should be a list of strings in order that are valid choices
-        for the enum.
+        *model* provides the data to populate the selector. It will be proxied
+        via a PlaceholderProxyModel that transparently manages an initial
+        placeholder item.
 
         '''
-        self._items = items
-        if self._items is None:
-            self._items = []
+        self._model = PlaceholderProxyModel(model)
         super(Enum, self).__init__(**kw)
 
     def _constructControl(self):
@@ -27,10 +27,7 @@ class Enum(Simple):
 
         '''
         control = QtGui.QComboBox()
-        control.addItem('Select')  # Title
-        control.addItems(self._items)
-        control.insertSeparator(1)
-
+        control.setModel(self._model)
         return control
 
     def _postConstruction(self):
