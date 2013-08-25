@@ -42,7 +42,8 @@
                 },
                 "properties": {
                     "label": {
-                        "enum": ["Main"]
+                        "enum": ["Main"],
+                        "default": "Main"
                     }
                 }
             }],
