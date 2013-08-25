@@ -247,3 +247,4 @@ class Array(Widget):
         self._itemList.insertRow(row)
         self._itemList.setCellWidget(row, 0, widget)
 
+        self._itemList.resizeRowToContents(row)
