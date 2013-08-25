@@ -46,11 +46,6 @@ class Enum(Simple):
 
         self._control.setItemText(0, placeholder)
 
-    def setRequired(self, value):
-        '''Set required status to boolean *value*.'''
-        super(Enum, self).setRequired(value)
-        self.setTitle(self.title())
-
     def value(self):
         '''Return current value.'''
         if self._control.currentIndex() == 0:

@@ -2,12 +2,12 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
-from .base import Widget
+from .standard import Standard
 
 
-class Container(Widget):
+class Container(Standard):
     '''Group together several related widgets.'''
 
     def __init__(self, children, columns=1, **kw):
@@ -31,22 +31,14 @@ class Container(Widget):
         self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
         self.setLineWidth(1)
 
-        self.setLayout(QtGui.QVBoxLayout())
-
-        self._header = QtGui.QFrame()
-        self._header.setLayout(QtGui.QHBoxLayout())
-
-        self._titleLabel = QtGui.QLabel()
         font = QtGui.QFont(self._titleLabel.font())
         font.setBold(True)
         self._titleLabel.setFont(font)
+        self._titleLabel.setAlignment(
+            QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
 
-        self._header.layout().addWidget(self._titleLabel, stretch=0)
-        self._header.layout().addStretch(1)
-        self._header.layout().addWidget(self._errorIndicator, stretch=0)
-        self._header.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.layout().addWidget(self._header, stretch=0)
+        self._headerLayout.insertStretch(1, stretch=1)
 
         # Layout children
         self._childrenLayout = QtGui.QGridLayout()
@@ -74,21 +66,6 @@ class Container(Widget):
             child['widget'].valueChanged.connect(self._emitValueChanged)
 
         super(Container, self)._postConstruction()
-
-    def setTitle(self, value):
-        '''Set title to *value*.'''
-        super(Container, self).setTitle(value)
-
-        title = self._title
-        if self.required():
-            title += '*'
-
-        self._titleLabel.setText(title)
-
-    def setRequired(self, value):
-        '''Set required status to boolean *value*.'''
-        super(Container, self).setRequired(value)
-        self.setTitle(self.title())
 
     def setError(self, value):
         '''Set error to *value*.

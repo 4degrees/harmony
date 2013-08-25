@@ -4,10 +4,10 @@
 
 from PySide import QtGui, QtCore
 
-from .base import Widget
+from .standard import Standard
 
 
-class Array(Widget):
+class Array(Standard):
     '''Represent a list of items with controls for addition and removal.'''
 
     def __init__(self, types, additionalType=None, **kw):
@@ -36,23 +36,14 @@ class Array(Widget):
         self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
         self.setLineWidth(1)
 
-        self.setLayout(QtGui.QVBoxLayout())
-
-        # Header
-        self._header = QtGui.QFrame()
-        self._header.setLayout(QtGui.QHBoxLayout())
-
-        self._titleLabel = QtGui.QLabel()
         font = QtGui.QFont(self._titleLabel.font())
         font.setBold(True)
         self._titleLabel.setFont(font)
+        self._titleLabel.setAlignment(
+            QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+        )
 
-        self._header.layout().addWidget(self._titleLabel, stretch=0)
-        self._header.layout().addStretch(1)
-        self._header.layout().addWidget(self._errorIndicator, stretch=0)
-        self._header.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.layout().addWidget(self._header, stretch=0)
+        self._headerLayout.insertStretch(1, stretch=1)
 
         # Item list
         self._itemList = QtGui.QTableWidget()
@@ -146,21 +137,6 @@ class Array(Widget):
         # Now recreate all remaining rows to ensure they have the correct type
         # after their index changed.
         self.setValue(self.value())
-
-    def setTitle(self, value):
-        '''Set title to *value*.'''
-        super(Array, self).setTitle(value)
-
-        title = self._title
-        if self.required():
-            title += '*'
-
-        self._titleLabel.setText(title)
-
-    def setRequired(self, value):
-        '''Set required status to boolean *value*.'''
-        super(Array, self).setRequired(value)
-        self.setTitle(self.title())
 
     def setError(self, value):
         '''Set error to *value*.
