@@ -187,9 +187,9 @@ class Array(Widget):
             if value is None:
                 value = {}
 
-            for row, error in value.items():
+            for row in range(self._itemList.rowCount()):
                 widget = self._itemList.cellWidget(row, 0)
-                widget.setError(error)
+                widget.setError(value.get(row, None))
 
     def value(self):
         '''Return current value.
@@ -248,3 +248,4 @@ class Array(Widget):
         self._itemList.setCellWidget(row, 0, widget)
 
         self._itemList.resizeRowToContents(row)
+
