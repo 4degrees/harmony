@@ -80,9 +80,19 @@ class Widget(QtGui.QFrame):
     def setError(self, value):
         '''Set error to *value*.'''
         self._error = value
+
         if value:
             self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
-            self._errorIndicator.setToolTip(value)
+
+            if isinstance(value, basestring):
+                self._errorIndicator.setToolTip(value)
+            elif isinstance(value, dict):
+                error = 'The follow validation errors occured:\n * '
+                error += '\n * '.join(sorted(value.values()))
+                self._errorIndicator.setToolTip(error)
+            else:
+                self._errorIndicator.setToolTip('A validation error occurred.')
+
         else:
             self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
             self._errorIndicator.setToolTip('')
