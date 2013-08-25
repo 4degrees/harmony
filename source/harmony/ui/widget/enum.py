@@ -64,6 +64,8 @@ class Enum(Simple):
             index = 0
         else:
             index = self._control.findText(value)
+            if index == -1:
+                index = 0
 
         self._control.setCurrentIndex(index)
 
