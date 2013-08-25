@@ -143,7 +143,9 @@ class Array(Widget):
         for row in rows:
             self._itemList.removeRow(row)
 
-        self._emitValueChanged()
+        # Now recreate all remaining rows to ensure they have the correct type
+        # after their index changed.
+        self.setValue(self.value())
 
     def setTitle(self, value):
         '''Set title to *value*.'''
