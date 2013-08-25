@@ -18,6 +18,8 @@ class Enum(Simple):
 
         '''
         self._items = items
+        if self._items is None:
+            self._items = []
         super(Enum, self).__init__(**kw)
 
     def _constructControl(self):
