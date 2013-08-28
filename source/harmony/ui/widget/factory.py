@@ -16,6 +16,8 @@ from .number import Number
 from .boolean import Boolean
 from .array import Array
 
+from ..model.templated_dictionary_list import TemplatedDictionaryList
+
 
 class Factory(object):
     '''Manage constructing widgets for schemas.'''
@@ -32,6 +34,20 @@ class Factory(object):
         schema_description = schema.get('description')
         schema_id = schema.get('id', '')
 
+        # IDs
+        if schema_id == 'harmony:/user':
+            user_model = TemplatedDictionaryList(
+                '{firstname} {lastname} ({email})',
+                self._query_users()
+            )
+
+            return Enum(
+                user_model,
+                title=schema_title,
+                description=schema_description
+            )
+
+        # Primitives
         if schema_type == 'object':
             # Construct child for each property.
             children = []
@@ -149,4 +165,18 @@ class Factory(object):
 
         raise ValueError('No widget able to represent schema: {0}'
                          .format(schema))
+
+    def _query_users(self):
+        '''Return a list of valid users.'''
+        users = []
+        for user in [
+            {'firstname': 'Martin', 'lastname': 'Pengelly-Phillips',
+             'email': 'martin@4degrees.ltd.uk', 'username': 'martin'},
+            {'firstname': 'Joe', 'lastname': 'Blogs',
+             'email': 'joe@example.com', 'username': 'joe'}
+        ]:
+            user = self.session.instantiate('harmony:/user', user)
+            users.append(user)
+
+        return users
 
