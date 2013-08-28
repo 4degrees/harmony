@@ -33,6 +33,12 @@ class PlaceholderProxyModel(QtGui.QProxyModel):
             index.row() - self._offset, index.column(), index.parent()
         )
 
+    def mapFromSource(self, index):
+        '''Map from source *index* to correct model *index*.'''
+        return self.index(
+            index.row() + self._offset, index.column(), index.parent()
+        )
+
     def data(self, index, role):
         '''Return data for *index* and *role*.
 
@@ -81,4 +87,13 @@ class PlaceholderProxyModel(QtGui.QProxyModel):
             return super(PlaceholderProxyModel, self).setData(
                 self.mapToSource(index), value, role
             )
+
+    def match(self, start, role, value, hits=1, flags=None):
+        '''Return indexes that match *value* for *role*.'''
+        return map(
+            self.mapFromSource,
+            super(PlaceholderProxyModel, self).match(
+                start, role, value, hits, flags
+            )
+        )
 
