@@ -10,6 +10,7 @@ import jsonpointer
 
 import harmony.session
 import harmony.ui.widget.factory
+import harmony.ui.error_tree
 
 
 class Demo(QtGui.QDialog):
@@ -100,30 +101,9 @@ class Demo(QtGui.QDialog):
         errors = self.session.validate(instance)
 
         # Construct error tree that maps errors to UI structure.
-        error_tree = {}
-        for error in errors:
-            error_branch = error_tree
+        error_tree = harmony.ui.error_tree.ErrorTree(errors)
 
-            path = list(error.path)
-            path.insert(0, '__root__')
-
-            if error.validator == 'required':
-                # Required is set one level above so have to retrieve final
-                # path segment.
-                schema_path = '/' + '/'.join(map(str, error.schema_path))
-                segment = jsonpointer.resolve_pointer(
-                    error.schema, schema_path
-                )
-                path.append(segment)
-
-            for segment in path[:-1]:
-                error_branch = error_branch.setdefault(segment, {})
-
-            error_branch[path[-1]] = error.message
-
-        self.schema_details_area.widget().setError(
-            error_tree.get('__root__', None)
-        )
+        self.schema_details_area.widget().setError(error_tree)
 
 
 class Factory(harmony.ui.widget.factory.Factory):
