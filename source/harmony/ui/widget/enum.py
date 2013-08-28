@@ -4,6 +4,7 @@
 
 from PySide import QtGui
 
+from ..model import HARMONY_DATA_ROLE
 from ..model.placeholder_proxy_model import PlaceholderProxyModel
 from .simple import Simple
 
@@ -50,14 +51,16 @@ class Enum(Simple):
         if self._control.currentIndex() == 0:
             return None
 
-        return self._control.itemText(self._control.currentIndex())
+        return self._control.itemData(
+            self._control.currentIndex(), role=HARMONY_DATA_ROLE
+        )
 
     def setValue(self, value):
         '''Set current *value*.'''
         if value is None:
             index = 0
         else:
-            index = self._control.findText(value)
+            index = self._control.findData(value, role=HARMONY_DATA_ROLE)
             if index == -1:
                 index = 0
 
