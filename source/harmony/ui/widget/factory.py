@@ -47,6 +47,16 @@ class Factory(object):
                 description=schema_description
             )
 
+        elif schema_id.startswith('harmony:/scope'):
+            scope = schema_id[len('harmony:/scope/'):]
+            items = self._query_scopes(scope)
+
+            return Enum(
+                TemplatedDictionaryList('{name} ({id})', items),
+                title=schema_title,
+                description=schema_description
+            )
+
         # Primitives
         if schema_type == 'object':
             # Construct child for each property.
@@ -77,16 +87,28 @@ class Factory(object):
 
             # Determine columns in layout.
             columns = 1
-            if (schema_id in ('harmony:/user', 'harmony:/resolution')
-                or schema_id.startswith('harmony:/scope/')):
+            if (schema_id in ('harmony:/user', 'harmony:/resolution')):
                 columns = 2
 
-            return Container(
+            widget = Container(
                 title=schema_title,
                 description=schema_description,
                 children=children,
                 columns=columns
             )
+
+            if schema_id.startswith('harmony:/domain'):
+                # Watch for changes to each child of the domain (assumed to be
+                # scope) and update other children as appropriate.
+                for child in widget.children:
+                    if isinstance(child['widget'], Enum):
+                        child['widget'].valueChanged.connect(
+                            partial(
+                                self.onDomainChanged, child['widget'], widget
+                            )
+                        )
+
+            return widget
 
         if schema_type == 'array':
             items = schema.get('items', [])
@@ -175,3 +197,50 @@ class Factory(object):
         '''
         return []
 
+    def _query_scopes(self, scope, domain=None):
+        '''Return list of entries for *scope* using *domain*.
+
+        Subclasses should override this to query their scope provider.
+        The return value should be a list of 'harmony:/scope/*' instances.
+
+        '''
+        return []
+
+    def onDomainChanged(self, sender, container):
+        '''Update scope widgets based on domain.
+
+        *sender* is the scope widget whose value has changed.
+        *container* is the domain container widget that holds the scope
+        widgets.
+
+        '''
+        domain = container.value()
+        if domain is None:
+            domain = {}
+
+        children_by_name = {}
+        for child in container.children:
+            children_by_name[child['name']] = child['widget']
+
+        show = children_by_name.get('show')
+        scene = children_by_name.get('scene')
+        shot = children_by_name.get('shot')
+
+        dependants = ()
+        if sender == show:
+            dependants = ('scene', 'shot', 'asset')
+        elif sender == scene:
+            dependants = ('shot', 'asset')
+        elif sender == shot:
+            dependants = ('asset',)
+
+        for scope in dependants:
+            widget = children_by_name.get(scope)
+
+            if widget is not None:
+                widget.setModel(
+                    TemplatedDictionaryList(
+                        '{name} ({id})', self._query_scopes(scope, domain)
+                    )
+                )
+                break
