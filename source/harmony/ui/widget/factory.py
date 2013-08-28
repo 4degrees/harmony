@@ -167,16 +167,11 @@ class Factory(object):
                          .format(schema))
 
     def _query_users(self):
-        '''Return a list of valid users.'''
-        users = []
-        for user in [
-            {'firstname': 'Martin', 'lastname': 'Pengelly-Phillips',
-             'email': 'martin@4degrees.ltd.uk', 'username': 'martin'},
-            {'firstname': 'Joe', 'lastname': 'Blogs',
-             'email': 'joe@example.com', 'username': 'joe'}
-        ]:
-            user = self.session.instantiate('harmony:/user', user)
-            users.append(user)
+        '''Return a list of valid users.
 
-        return users
+        Subclasses should override this to query their user provider.
+        The return value should be a list of 'harmony:/user' instances.
+
+        '''
+        return []
 
