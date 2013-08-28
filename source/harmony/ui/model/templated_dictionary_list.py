@@ -34,6 +34,18 @@ class TemplatedDictionaryList(QtCore.QAbstractListModel):
         '''Return a count of the number of rows in the model.'''
         return len(self._items)
 
+    def clear(self):
+        '''Remove all items from model.'''
+        self.beginResetModel()
+        del self._items[:]
+        self.endResetModel()
+
+    def setItems(self, items):
+        '''Set current *items* clearing any existing ones.'''
+        self.beginResetModel()
+        self._items = items
+        self.endResetModel()
+
     def data(self, index, role):
         '''Return data for *role* at *index*.
 
