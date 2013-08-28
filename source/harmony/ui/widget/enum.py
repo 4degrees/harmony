@@ -66,3 +66,13 @@ class Enum(Simple):
 
         self._control.setCurrentIndex(index)
 
+    def setModel(self, model):
+        '''Set *model*.'''
+        self._model = PlaceholderProxyModel(model)
+        self._control.setModel(self._model)
+        self.setTitle(self.title())
+
+    def model(self):
+        '''Return current model.'''
+        return self._model.model()
+
