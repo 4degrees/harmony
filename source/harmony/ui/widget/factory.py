@@ -4,8 +4,6 @@
 
 from functools import partial
 
-from PySide import QtGui
-
 from .container import Container
 from .string import String
 from .text import Text
@@ -17,6 +15,7 @@ from .boolean import Boolean
 from .array import Array
 
 from ..model.templated_dictionary_list import TemplatedDictionaryList
+from ..model.string_list import StringList
 
 
 class Factory(object):
@@ -145,7 +144,7 @@ class Factory(object):
                 return Enum(
                    title=schema_title,
                    description=schema_description,
-                   model=QtGui.QStringListModel(schema['enum'])
+                   model=StringList(schema['enum'])
                 )
             elif schema.get('format', '') == 'text':
                 return Text(
