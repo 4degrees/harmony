@@ -38,9 +38,12 @@ class Publisher(QtGui.QDialog):
         self._schemaSelector = QtGui.QComboBox()
         self._schemaDetailsArea = QtGui.QScrollArea()
         self._schemaDetailsArea.setWidgetResizable(True)
+        self._publishButton = QtGui.QPushButton('Publish')
+        self._publishButton.setDisabled(True)
 
         self.layout().addWidget(self._schemaSelector, stretch=0)
         self.layout().addWidget(self._schemaDetailsArea, stretch=1)
+        self.layout().addWidget(self._publishButton, stretch=0)
 
     def _postConstruction(self):
         '''Perform post-construction operations.'''
@@ -97,6 +100,8 @@ class Publisher(QtGui.QDialog):
             self._schemaSelector.currentIndex()
         )
 
+        self._publishButton.setDisabled(True)
+
         if not schema:
             return
 
@@ -113,4 +118,9 @@ class Publisher(QtGui.QDialog):
 
         # Apply errors to interface.
         self._schemaDetailsArea.widget().setError(error_tree)
+        if error_tree:
+            self._publishButton.setDisabled(True)
+        else:
+            self._publishButton.setEnabled(True)
+
 
