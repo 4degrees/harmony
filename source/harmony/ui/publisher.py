@@ -4,9 +4,10 @@
 
 import copy
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 import harmony.ui.error_tree
+import harmony.ui.worker
 
 
 class Publisher(QtGui.QDialog):
@@ -133,14 +134,43 @@ class Publisher(QtGui.QDialog):
     def publish(self):
         '''Publish instance.'''
         instance = self._schemaDetailsArea.widget().value()
+
+        process_dialog = QtGui.QProgressDialog(
+            'Publishing in progress.', '', 0, 0, parent=self
+        )
+        process_dialog.setWindowTitle('Publishing')
+        process_dialog.setWindowModality(QtCore.Qt.WindowModal)
+        process_dialog.setMinimumDuration(0)
+        process_dialog.setCancelButton(None)
+        process_dialog.show()
+
         try:
-            self._publish(instance)
+            worker = harmony.ui.worker.Worker(self._publish, [instance])
+            worker.start()
+
+            while worker.isRunning():
+                app = QtGui.QApplication.instance()
+                app.processEvents()
+
+            if worker.error:
+                raise worker.error[1], None, worker.error[2]
+
         except Exception as error:
+            process_dialog.reset()
             QtGui.QMessageBox.critical(
                 self,
                 'Publish Error',
                 'The following error occurred whilst publishing:' +
                 '\n{0}'.format(error)
+            )
+
+        else:
+            process_dialog.reset()
+            QtGui.QMessageBox.information(
+                self,
+                'Publish completed',
+                'Publish completed successfully!'
+                '\n{0}'.format(worker.result or '')
             )
 
         self._postPublish()

@@ -3,6 +3,7 @@
 # :license: See LICENSE.txt.
 
 import sys
+import time
 from functools import partial
 
 from PySide import QtGui, QtCore
@@ -12,6 +13,15 @@ import harmony.session
 import harmony.ui.widget.factory
 import harmony.ui.error_tree
 import harmony.ui.publisher
+
+
+class Publisher(harmony.ui.publisher.Publisher):
+    '''Customised publisher.'''
+
+    def _publish(self, instance):
+        '''Perform publish.'''
+        for index in range(5):
+            time.sleep(1)
 
 
 class Factory(harmony.ui.widget.factory.Factory):
@@ -132,7 +142,7 @@ def main(arguments=None):
 
     session = harmony.session.Session()
     factory = Factory(session)
-    dialog = harmony.ui.publisher.Publisher(session, factory)
+    dialog = Publisher(session, factory)
     dialog.resize(600, 800)
     dialog.show()
 
