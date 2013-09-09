@@ -2,6 +2,8 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
+import copy
+
 from PySide import QtGui
 
 import harmony.ui.error_tree
@@ -50,6 +52,7 @@ class Publisher(QtGui.QDialog):
         self.setWindowTitle('Harmony Publisher')
 
         self._schemaSelector.currentIndexChanged.connect(self._onSelectSchema)
+        self._publishButton.clicked.connect(self._onPublishButtonClicked)
 
         for schema in sorted(self._filterSchemas(self._session.schemas)):
             self._schemaSelector.addItem(
@@ -123,4 +126,41 @@ class Publisher(QtGui.QDialog):
         else:
             self._publishButton.setEnabled(True)
 
+    def _onPublishButtonClicked(self):
+        '''Handle publish button event.'''
+        self.publish()
 
+    def publish(self):
+        '''Publish instance.'''
+        instance = self._schemaDetailsArea.widget().value()
+        try:
+            self._publish(instance)
+        except Exception as error:
+            QtGui.QMessageBox.critical(
+                self,
+                'Publish Error',
+                'The following error occurred whilst publishing:' +
+                '\n{0}'.format(error)
+            )
+
+        self._postPublish()
+
+    def _publish(self, instance):
+        '''Publish *instance*.
+
+        Override in subclasses to perform actual publish.
+
+        '''
+
+    def _postPublish(self):
+        '''Perform post publish action.'''
+        self._prepareSubsequentPublish()
+
+    def _prepareSubsequentPublish(self):
+        '''Clean instance data in preparation for subsequent publish.'''
+        instance = self._schemaDetailsArea.widget().value()
+        newInstance = copy.deepcopy(instance)
+        for key in ('id', 'created', 'modified'):
+            newInstance.pop(key, None)
+
+        self._schemaDetailsArea.widget().setValue(newInstance)
