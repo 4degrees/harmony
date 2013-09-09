@@ -127,14 +127,22 @@ class Container(Standard):
 
         *value* must be a dictionary with each key corresponding to the name
         of a child of this container and that key's value the value to set for
-        the child.
+        the child. If a child is not included in *value* then it will have its
+        value set to None.
 
         '''
         children_by_name = {}
         for child in self.children:
             children_by_name[child['name']] = child['widget']
 
+        children_set = set([])
         for child_name, child_value in value.items():
             child = children_by_name.get(child_name)
             if child:
                 child.setValue(child_value)
+                children_set.add(child_name)
+
+        for child_name, child in children_by_name.items():
+            if child_name not in children_set:
+                child.setValue(None)
+

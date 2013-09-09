@@ -31,5 +31,8 @@ class Boolean(Simple):
 
     def setValue(self, value):
         '''Set current *value*.'''
+        if value is None:
+            value = False
+
         self._control.setChecked(value)
 
