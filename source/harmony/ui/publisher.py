@@ -175,7 +175,7 @@ class Publisher(QtGui.QDialog):
                 '\n{0}'.format(worker.result or '')
             )
 
-        self._postPublish()
+        self._postPublish(instance)
 
     def _publish(self, instance):
         '''Publish *instance*.
@@ -184,15 +184,19 @@ class Publisher(QtGui.QDialog):
 
         '''
 
-    def _postPublish(self):
+    def _postPublish(self, instance):
         '''Perform post publish action.'''
-        self._prepareSubsequentPublish()
+        newInstance = self._prepareSubsequentPublish(instance)
+        self._schemaDetailsArea.widget().setValue(newInstance)
 
-    def _prepareSubsequentPublish(self):
-        '''Clean instance data in preparation for subsequent publish.'''
-        instance = self._schemaDetailsArea.widget().value()
+    def _prepareSubsequentPublish(self, instance):
+        '''Return copy of *instance* ready for subsequent publish.
+
+        For example, remove "id" and "created" values.
+
+        '''
         newInstance = copy.deepcopy(instance)
         for key in ('id', 'created', 'modified'):
             newInstance.pop(key, None)
 
-        self._schemaDetailsArea.widget().setValue(newInstance)
+        return newInstance
