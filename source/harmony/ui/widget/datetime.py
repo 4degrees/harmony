@@ -27,12 +27,13 @@ class DateTime(Simple):
         if value is None:
             return value
 
-        return value.toString(QtCore.Qt.ISODate)
+        return value.toUTC().toString(QtCore.Qt.ISODate)
 
     def setValue(self, value):
         '''Set current *value*.'''
         if value is not None:
             value = QtCore.QDateTime.fromString(value, QtCore.Qt.ISODate)
+            value = value.toLocalTime()
 
         self._control.setDateTime(value)
 
