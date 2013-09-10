@@ -3,6 +3,7 @@
 # :license: See LICENSE.txt.
 
 import copy
+import traceback
 
 from PySide import QtGui, QtCore
 
@@ -161,7 +162,8 @@ class Publisher(QtGui.QDialog):
                 self,
                 'Publish Error',
                 'The following error occurred whilst publishing:' +
-                '\n{0}'.format(error)
+                '\n{0}'.format(error) +
+                '\n\n{0}'.format(traceback.format_exc())
             )
 
         else:
