@@ -4,6 +4,7 @@
 
 import sys
 import time
+import pprint
 from functools import partial
 
 from PySide import QtGui, QtCore
@@ -23,6 +24,7 @@ class Publisher(harmony.ui.publisher.Publisher):
         for index in range(5):
             time.sleep(1)
 
+        return pprint.pformat(instance)
 
 class Factory(harmony.ui.widget.factory.Factory):
     '''Customised widget factory.'''
