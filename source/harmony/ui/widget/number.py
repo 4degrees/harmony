@@ -52,4 +52,7 @@ class Number(String):
 
     def setValue(self, value):
         '''Set current *value*.'''
-        super(Number, self).setValue(str(value))
+        if value is not None:
+            value = str(value)
+        super(Number, self).setValue(value)
+
