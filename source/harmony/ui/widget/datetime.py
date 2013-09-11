@@ -4,26 +4,73 @@
 
 from PySide import QtGui, QtCore
 
-from .simple import Simple
+from .standard import Standard
 
 
-class DateTime(Simple):
+class DateTime(Standard):
     '''Date and time input.'''
 
-    def _constructControl(self):
-        '''Return the control widget.'''
-        control = DateTimeEdit()
-        control.setCalendarPopup(True)
-        return control
+    def __init__(self, auto=True, **kw):
+        '''Initialise widget.
+
+        If *auto* is True (the default) then the auto toggle will initially
+        be checked. When the auto toggle is checked the datetime will reflect
+        the current date and time. Set *auto* to None to hide the toggle.
+
+        '''
+        self._auto = auto
+        super(DateTime, self).__init__(**kw)
+
+    def _construct(self):
+        '''Construct the interface.'''
+        super(DateTime, self)._construct()
+        self._timer = QtCore.QTimer()
+
+        self._autoToggle = QtGui.QCheckBox('Auto')
+        self._headerLayout.insertWidget(1, self._autoToggle, stretch=0)
+
+        self._dateTimeEdit = DateTimeEdit()
+        self._dateTimeEdit.setCalendarPopup(True)
+        self._headerLayout.insertWidget(1, self._dateTimeEdit, stretch=1)
 
     def _postConstruction(self):
         '''Perform post-construction operations.'''
         super(DateTime, self)._postConstruction()
-        self._control.dateTimeChanged.connect(self._emitValueChanged)
+        self._dateTimeEdit.dateTimeChanged.connect(self._emitValueChanged)
+        self._autoToggle.stateChanged.connect(self._onAutoToggle)
+        self._timer.timeout.connect(self._setValueToCurrentDateTime)
+
+        if self._auto:
+            self._autoToggle.setChecked(True)
+
+        elif self._auto is None:
+            self._autoToggle.setHidden(True)
+
+    def _onAutoToggle(self, state):
+        '''Handle auto toggle *state* change.'''
+        if state == QtCore.Qt.CheckState.Checked:
+            self._dateTimeEdit.setDisabled(True)
+            self._setValueToCurrentDateTime()
+            self._emitValueChanged()
+
+            self._dateTimeEdit.dateTimeChanged.disconnect(
+                self._emitValueChanged
+            )
+            self._timer.start(500)
+
+        elif state == QtCore.Qt.CheckState.Unchecked:
+            self._timer.stop()
+            self._dateTimeEdit.dateTimeChanged.connect(self._emitValueChanged)
+            self._emitValueChanged()
+            self._dateTimeEdit.setEnabled(True)
+
+    def _setValueToCurrentDateTime(self):
+        '''Update datetime to reflect current date and time.'''
+        self._dateTimeEdit.setDateTime(QtCore.QDateTime.currentDateTime())
 
     def value(self):
         '''Return current value.'''
-        value = self._control.dateTime()
+        value = self._dateTimeEdit.dateTime()
         if value is None:
             return value
 
@@ -31,11 +78,14 @@ class DateTime(Simple):
 
     def setValue(self, value):
         '''Set current *value*.'''
+        if self._autoToggle.isChecked():
+            return
+
         if value is not None:
             value = QtCore.QDateTime.fromString(value, QtCore.Qt.ISODate)
             value = value.toLocalTime()
 
-        self._control.setDateTime(value)
+        self._dateTimeEdit.setDateTime(value)
 
 
 class DateTimeEdit(QtGui.QDateTimeEdit):
