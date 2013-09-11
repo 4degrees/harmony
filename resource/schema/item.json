@@ -111,11 +111,7 @@
             "pattern": "^\\d{3}$",
             "default": "000",
             "order": 9
-        },
-        "foo": {
-            "type": "boolean",
-            "title": "Foo"
         }
     },
-    "required": ["author", "created", "domain", "version", "foo"]
+    "required": ["author", "created", "domain", "version"]
 }
