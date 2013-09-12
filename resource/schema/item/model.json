@@ -54,7 +54,12 @@
                         "default": "TIFF Sequence"
                     }
                 }
-            }]
+            }],
+            "default": [
+                {"harmony_type": "harmony:/datum", "label": "Main"},
+                {"harmony_type": "harmony:/datum", "label": "EXR Sequence"},
+                {"harmony_type": "harmony:/datum", "label": "TIFF Sequence"}
+            ]
         },
         "department": {
             "enum": [
