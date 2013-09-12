@@ -151,22 +151,22 @@ class Array(Standard):
         If *value* is a string it will be displayed at the container level.
 
         '''
+        childValues = {}
 
         if isinstance(value, basestring):
             super(Array, self).setError(value)
 
         elif isinstance(value, collections.Mapping):
+            childValues = value
+
             if '__self__' in value:
                 super(Array, self).setError(value['__self__'])
             else:
                 super(Array, self).setError(None)
 
-            if value is None:
-                value = {}
-
-            for row in range(self._itemList.rowCount()):
-                widget = self._itemList.cellWidget(row, 0)
-                widget.setError(value.get(row, None))
+        for row in range(self._itemList.rowCount()):
+            widget = self._itemList.cellWidget(row, 0)
+            widget.setError(childValues.get(row, None))
 
         # Set at end to override parent class.
         self._error = value

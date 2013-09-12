@@ -82,21 +82,22 @@ class Container(Standard):
         If *value* is a string it will be displayed at the container level.
 
         '''
+        childValues = {}
+
         if isinstance(value, basestring):
             super(Container, self).setError(value)
 
         elif isinstance(value, collections.Mapping):
+            childValues = value
+
             if '__self__' in value:
                 super(Container, self).setError(value['__self__'])
             else:
                 super(Container, self).setError(None)
 
-            if value is None:
-                value = {}
-
-            for child in self.children:
-                child_error = value.get(child['name'], None)
-                child['widget'].setError(child_error)
+        for child in self.children:
+            child_error = childValues.get(child['name'], None)
+            child['widget'].setError(child_error)
 
         # Set at end to override parent class.
         self._error = value
