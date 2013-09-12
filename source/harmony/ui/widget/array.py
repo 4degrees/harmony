@@ -2,6 +2,8 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
+import collections
+
 from PySide import QtGui, QtCore
 
 from .standard import Standard
@@ -149,25 +151,25 @@ class Array(Standard):
         If *value* is a string it will be displayed at the container level.
 
         '''
-        self._error = value
 
         if isinstance(value, basestring):
-            if value:
-                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
-                self._errorIndicator.setToolTip(value)
-            else:
-                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
-                self._errorIndicator.setToolTip('')
+            super(Array, self).setError(value)
 
-        else:
-            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
-            self._errorIndicator.setToolTip('')
+        elif isinstance(value, collections.Mapping):
+            if '__self__' in value:
+                super(Array, self).setError(value['__self__'])
+            else:
+                super(Array, self).setError(None)
+
             if value is None:
                 value = {}
 
             for row in range(self._itemList.rowCount()):
                 widget = self._itemList.cellWidget(row, 0)
                 widget.setError(value.get(row, None))
+
+        # Set at end to override parent class.
+        self._error = value
 
     def value(self):
         '''Return current value.

@@ -14,6 +14,48 @@
             "pattern": "^harmony:/item/model$",
             "default": "harmony:/item/model"
         },
+        "data": {
+            "items": [{
+                "$mixin": {
+                    "$ref": "harmony:/datum",
+                    "hints": {
+                        "/properties/label/enum": "preserve"
+                    }
+                },
+                "properties": {
+                    "label": {
+                        "enum": ["Main"],
+                        "default": "Main"
+                    }
+                }
+            }, {
+                "$mixin": {
+                    "$ref": "harmony:/datum",
+                    "hints": {
+                        "/properties/label/enum": "preserve"
+                    }
+                },
+                "properties": {
+                    "label": {
+                        "enum": ["EXR Sequence"],
+                        "default": "EXR Sequence"
+                    }
+                }
+            }, {
+                "$mixin": {
+                    "$ref": "harmony:/datum",
+                    "hints": {
+                        "/properties/label/enum": "preserve"
+                    }
+                },
+                "properties": {
+                    "label": {
+                        "enum": ["TIFF Sequence"],
+                        "default": "TIFF Sequence"
+                    }
+                }
+            }]
+        },
         "department": {
             "enum": [
                 "Model",
@@ -43,5 +85,5 @@
             "order": 8.6
         }
     },
-    "required": ["lod", "variation"]
+    "required": ["lod", "variation", "data"]
 }

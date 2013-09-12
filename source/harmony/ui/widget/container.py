@@ -2,6 +2,8 @@
 # :copyright: Copyright (c) 2013 Martin Pengelly-Phillips
 # :license: See LICENSE.txt.
 
+import collections
+
 from PySide import QtGui, QtCore
 
 from .standard import Standard
@@ -74,30 +76,30 @@ class Container(Standard):
 
         If *value* is a dictionary then each key should correspond to the name
         of a child of this container and that key's value the error to set for
-        the child.
+        the child. The special key '__self__' can be used to set an error
+        at the container level as well as child levels.
 
         If *value* is a string it will be displayed at the container level.
 
         '''
-        self._error = value
-
         if isinstance(value, basestring):
-            if value:
-                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
-                self._errorIndicator.setToolTip(value)
-            else:
-                self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
-                self._errorIndicator.setToolTip('')
+            super(Container, self).setError(value)
 
-        else:
-            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
-            self._errorIndicator.setToolTip('')
+        elif isinstance(value, collections.Mapping):
+            if '__self__' in value:
+                super(Container, self).setError(value['__self__'])
+            else:
+                super(Container, self).setError(None)
+
             if value is None:
                 value = {}
 
             for child in self.children:
                 child_error = value.get(child['name'], None)
                 child['widget'].setError(child_error)
+
+        # Set at end to override parent class.
+        self._error = value
 
     def value(self):
         '''Return current value.

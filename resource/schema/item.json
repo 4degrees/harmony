@@ -33,6 +33,7 @@
             "description": "Data associated with this item, such as a file.",
             "type": "array",
             "order": 1,
+            "minItems": 3,
             "items": [{
                 "$mixin": {
                     "$ref": "harmony:/datum",

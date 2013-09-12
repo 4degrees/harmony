@@ -13,10 +13,14 @@ class ErrorTree(Mapping):
     def __init__(self, errors):
         '''Initialise tree from *errors* list.'''
         tree = {}
-        for error in errors:
+        for error in sorted(
+            errors, key=lambda item: len(list(item.path)),
+            reverse=True
+        ):
             branch = tree
 
             path = list(error.path)
+
             path.insert(0, '__root__')
 
             if error.validator == 'required':
@@ -31,7 +35,10 @@ class ErrorTree(Mapping):
             for segment in path[:-1]:
                 branch = branch.setdefault(segment, {})
 
-            branch[path[-1]] = error.message
+            if path[-1] in branch and isinstance(branch[path[-1]], Mapping):
+                branch[path[-1]]['__self__'] = error.message
+            else:
+                branch[path[-1]] = error.message
 
         self._tree = tree.get('__root__', {})
 
