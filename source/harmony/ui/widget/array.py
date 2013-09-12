@@ -145,8 +145,10 @@ class Array(Standard):
 
         *value* can be either a dictionary or a string.
 
-        If *value* is a dictionary then each entry should correspond to a
-        the index of a current item.
+        If *value* is a dictionary then each entry should correspond to
+        the index of a current item with the error value to set for that item.
+        The special key '__self__' can be used to set an error at the container
+        level as well as child levels.
 
         If *value* is a string it will be displayed at the container level.
 
