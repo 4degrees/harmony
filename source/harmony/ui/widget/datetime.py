@@ -74,7 +74,11 @@ class DateTime(Standard):
         if value is None:
             return value
 
-        return value.toUTC().toString(QtCore.Qt.ISODate)
+        value = value.toUTC().toString(QtCore.Qt.ISODate)
+        if not value.endswith('Z'):
+            value += 'Z'
+
+        return value
 
     def setValue(self, value):
         '''Set current *value*.'''
