@@ -29,6 +29,10 @@ class Standard(Widget):
         self.layout().addLayout(self._headerLayout, stretch=0)
         self.layout().setContentsMargins(0, 0, 0, 0)
 
+        self.setSizePolicy(
+            QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed
+        )
+
     def setTitle(self, value):
         '''Set title to *value*.'''
         super(Standard, self).setTitle(value)
@@ -48,4 +52,3 @@ class Standard(Widget):
         '''Set description to *value*.'''
         super(Standard, self).setDescription(value)
         self._titleLabel.setToolTip(self._description)
-

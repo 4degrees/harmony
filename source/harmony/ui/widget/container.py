@@ -55,10 +55,6 @@ class Container(Standard):
 
         self.layout().addLayout(self._childrenLayout, stretch=1)
 
-        self.setSizePolicy(
-               QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed
-        )
-
         self.layout().setContentsMargins(5, 5, 5, 5)
 
     def _postConstruction(self):
@@ -148,4 +144,3 @@ class Container(Standard):
         for child_name, child in children_by_name.items():
             if child_name not in children_set:
                 child.setValue(None)
-
