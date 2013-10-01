@@ -90,8 +90,12 @@ class Array(Standard):
         self.layout().addWidget(self._footer)
 
         self.layout().setContentsMargins(5, 5, 5, 5)
+
+        # Override fixed height sizing policy to allow array view to grow with
+        # container.
         self.setSizePolicy(
-               QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed
+            QtGui.QSizePolicy.MinimumExpanding,
+            QtGui.QSizePolicy.MinimumExpanding
         )
 
     def _postConstruction(self):
@@ -230,4 +234,3 @@ class Array(Standard):
         self._itemList.setCellWidget(row, 0, widget)
 
         self._itemList.resizeRowToContents(row)
-

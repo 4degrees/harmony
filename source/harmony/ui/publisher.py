@@ -85,11 +85,13 @@ class Publisher(QtGui.QDialog):
         schemaDetails.setRequired(True)
         schemaDetails.setContentsMargins(5, 5, 5, 5)
         schemaDetails.setFrameStyle(QtGui.QFrame.NoFrame)
+        schemaDetails.setSizePolicy(
+            QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Expanding
+        )
 
         self._schemaDetailsArea.setFrameStyle(
             QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain
         )
-
         self._schemaDetailsArea.setWidget(schemaDetails)
 
         # Connect dynamic validation.
