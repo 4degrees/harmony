@@ -90,7 +90,7 @@ class FilesystemBrowser(QtGui.QDialog):
         self.setLocation('')
 
         self._filesystemWidget.horizontalHeader().setResizeMode(
-            QtGui.QHeaderView.Interactive
+            QtGui.QHeaderView.ResizeToContents
         )
         self._filesystemWidget.horizontalHeader().setResizeMode(
             0, QtGui.QHeaderView.Stretch
