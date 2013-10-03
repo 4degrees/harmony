@@ -13,6 +13,7 @@ from .integer import Integer
 from .number import Number
 from .boolean import Boolean
 from .array import Array
+from filesystem_path import FilesystemPath
 
 from ..model.templated_dictionary_list import TemplatedDictionaryList
 from ..model.string_list import StringList
@@ -153,6 +154,11 @@ class Factory(object):
                 )
             elif schema.get('format', '') == 'date-time':
                 return DateTime(
+                    title=schema_title,
+                    description=schema_description
+                )
+            elif schema.get('format', '') == 'filesystem-path':
+                return FilesystemPath(
                     title=schema_title,
                     description=schema_description
                 )
