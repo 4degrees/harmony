@@ -12,5 +12,9 @@
         <file alias="icon_next">circle_arrow_right.png</file>
         <file alias="icon_previous">circle_arrow_left.png</file>
         <file alias="icon_up">circle_arrow_up.png</file>
+        <file alias="icon_computer">computer.png</file>
+        <file alias="icon_drive">drive.png</file>
+        <file alias="icon_folder">folder.png</file>
+        <file alias="icon_file">file.png</file>
     </qresource>
 </RCC>

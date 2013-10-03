@@ -154,6 +154,9 @@ class FilesystemBrowser(QtGui.QDialog):
                 self._locationWidget.addItem(icon, segment, segment)
 
         rootIcon = model.iconFactory.icon(model.iconFactory.Computer)
+        if rootIcon is None:
+            rootIcon = QtGui.QIcon(':icon_folder')
+
         self._locationWidget.addItem(rootIcon, model.root.name, model.root.path)
 
         if self._locationWidget.count() > 1:
