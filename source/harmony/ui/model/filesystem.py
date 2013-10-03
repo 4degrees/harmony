@@ -185,32 +185,22 @@ class FilesystemDirectory(FilesystemItem):
             paths.append(os.path.normpath(os.path.join(self.path, name)))
 
         # Handle collections.
-        # TODO: When https://github.com/4degrees/clique/issues/4 resolved
-        # can update this to avoid extra processing.
-        collections = clique.assemble(paths, [clique.PATTERNS['frames']])
+        collections, remainder = clique.assemble(
+            paths, [clique.PATTERNS['frames']]
+        )
 
-        for path in paths:
-            collected = False
+        for path in remainder:
+            if os.path.isfile(path):
+                child = FilesystemFile(path)
 
-            for collection in collections:
-                if path in collection:
-                    collected = True
-                    break
+            elif os.path.ismount(path):
+                child = FilesystemMount(path)
 
-            if not collected:
-                child = None
+            elif os.path.isdir(path):
+                child = FilesystemDirectory(path)
 
-                if os.path.isfile(path):
-                    child = FilesystemFile(path)
-
-                elif os.path.ismount(path):
-                    child = FilesystemMount(path)
-
-                elif os.path.isdir(path):
-                    child = FilesystemDirectory(path)
-
-                if child is not None:
-                    children.append(child)
+            if child is not None:
+                children.append(child)
 
         for collection in collections:
             children.append(FilesystemCollection(collection))
