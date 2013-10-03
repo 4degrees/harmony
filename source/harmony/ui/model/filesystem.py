@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 from PySide.QtCore import Qt, QAbstractItemModel, QModelIndex, QDir, QFileInfo
-from PySide.QtGui import QIcon, QFileIconProvider
+from PySide.QtGui import QIcon, QFileIconProvider, QSortFilterProxyModel
 import clique
 
 
@@ -301,7 +301,7 @@ class Filesystem(QAbstractItemModel):
         self.columns = ['Name', 'Size', 'Type', 'Date Modified']
         self.iconFactory = QFileIconProvider()
         self.root = FilesystemRoot()
-        
+
     def rowCount(self, parent):
         '''Return number of children *parent* index has.'''
         if parent.column() > 0:
@@ -498,3 +498,67 @@ class Filesystem(QAbstractItemModel):
         self.root = FilesystemRoot()
         self.root.refetch()
         self.endResetModel()
+
+
+class FilesystemSortProxy(QSortFilterProxyModel):
+    '''Sort directories before files.'''
+
+    def lessThan(self, left, right):
+        '''Return ordering of *left* vs *right*.'''
+        sourceModel = self.sourceModel()
+        if sourceModel:
+            leftItem = sourceModel.item(left)
+            rightItem = sourceModel.item(right)
+
+            if (isinstance(leftItem, FilesystemDirectory)
+                and not isinstance(rightItem, FilesystemDirectory)):
+                return self.sortOrder() == Qt.AscendingOrder
+
+            elif (not isinstance(leftItem, FilesystemDirectory)
+                and isinstance(rightItem, FilesystemDirectory)):
+                return self.sortOrder() == Qt.DescendingOrder
+
+        return super(FilesystemSortProxy, self).lessThan(left, right)
+
+    @property
+    def root(self):
+        '''Return root of model.'''
+        sourceModel = self.sourceModel()
+        if not sourceModel:
+            return None
+
+        return sourceModel.root
+
+    @property
+    def iconFactory(self):
+        '''Return iconFactory of model.'''
+        sourceModel = self.sourceModel()
+        if not sourceModel:
+            return None
+
+        return sourceModel.iconFactory
+
+    def pathIndex(self, path):
+        '''Return index of item with *path*.'''
+        sourceModel = self.sourceModel()
+        if not sourceModel:
+            return QModelIndex()
+
+        return self.mapFromSource(sourceModel.pathIndex(path))
+
+    def item(self, index):
+        '''Return item at *index*.'''
+        sourceModel = self.sourceModel()
+
+        if not sourceModel:
+            return None
+
+        return sourceModel.item(self.mapToSource(index))
+
+    def icon(self, index):
+        '''Return icon for index.'''
+        sourceModel = self.sourceModel()
+        if not sourceModel:
+            return None
+
+        return sourceModel.icon(self.mapToSource(index))

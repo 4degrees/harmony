@@ -3,7 +3,7 @@
 # :license: See LICENSE.txt.
 import os
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 import harmony.ui.icon
 import harmony.ui.model.filesystem
@@ -56,8 +56,11 @@ class FilesystemBrowser(QtGui.QDialog):
 
         self._contentSplitter.addWidget(self._filesystemWidget)
 
-        model = harmony.ui.model.filesystem.Filesystem()
-        self._filesystemWidget.setModel(model)
+        proxy = harmony.ui.model.filesystem.FilesystemSortProxy(self)
+        model = harmony.ui.model.filesystem.Filesystem(self)
+        proxy.setSourceModel(model)
+        self._filesystemWidget.setModel(proxy)
+        self._filesystemWidget.setSortingEnabled(True)
 
         self._contentSplitter.setStretchFactor(1, 1)
         self.layout().addWidget(self._contentSplitter)
@@ -76,6 +79,7 @@ class FilesystemBrowser(QtGui.QDialog):
     def _postConstruction(self):
         '''Perform post-construction operations.'''
         self.setWindowTitle('Filesystem Browser')
+        self._filesystemWidget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         self._acceptButton.setDefault(True)
         self._acceptButton.setDisabled(True)
