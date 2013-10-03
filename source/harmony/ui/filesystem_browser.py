@@ -81,6 +81,9 @@ class FilesystemBrowser(QtGui.QDialog):
         self.setWindowTitle('Filesystem Browser')
         self._filesystemWidget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
+        # TODO: Remove once bookmarks widget implemented.
+        self._bookmarksWidget.hide()
+
         self._acceptButton.setDefault(True)
         self._acceptButton.setDisabled(True)
 
