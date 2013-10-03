@@ -57,7 +57,8 @@ setup(
     install_requires=[
         'jsonschema >= 2.0.1',
         'jsonpointer >= 1.0',
-        'PySide >= 1.1.1'
+        'PySide >= 1.1.1',
+        'Clique >= 1.1.0'
     ],
     tests_require=['pytest >= 2.3.5'],
     cmdclass={
