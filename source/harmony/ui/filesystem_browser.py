@@ -3,9 +3,10 @@
 # :license: See LICENSE.txt.
 import os
 
-from PySide import QtGui, QtCore
+from PySide import QtGui
 
 import harmony.ui.icon
+import harmony.ui.model.filesystem
 
 
 class FilesystemBrowser(QtGui.QDialog):
@@ -55,7 +56,7 @@ class FilesystemBrowser(QtGui.QDialog):
 
         self._contentSplitter.addWidget(self._filesystemWidget)
 
-        model = QtGui.QFileSystemModel()
+        model = harmony.ui.model.filesystem.Filesystem()
         self._filesystemWidget.setModel(model)
 
         self._contentSplitter.setStretchFactor(1, 1)
@@ -82,7 +83,6 @@ class FilesystemBrowser(QtGui.QDialog):
         self._acceptButton.clicked.connect(self.accept)
         self._cancelButton.clicked.connect(self.reject)
 
-        self._filesystemWidget.model().setRootPath('')
         self.setLocation('')
 
         self._filesystemWidget.horizontalHeader().setResizeMode(
@@ -103,23 +103,22 @@ class FilesystemBrowser(QtGui.QDialog):
 
     def _onActivateItem(self, index):
         '''Handle activation of item in listing.'''
-        info = self._filesystemWidget.model().fileInfo(index)
-        if not info.isFile():
+        item = self._filesystemWidget.model().item(index)
+        if not item.isFile():
             self._acceptButton.setDisabled(True)
-            path = info.canonicalFilePath()
-            self.setLocation(path)
+            self.setLocation(item.path)
 
     def _onSelectItem(self, selection, previousSelection):
         '''Handle selection of item in listing.'''
         self._acceptButton.setEnabled(True)
         del self._selected[:]
-        info = self._filesystemWidget.model().fileInfo(selection)
-        self._selected.append(info.canonicalFilePath())
+        item = self._filesystemWidget.model().item(selection)
+        self._selected.append(item.path)
 
     def _onNavigate(self, index):
         '''Handle selection of path segment.'''
         if index > 0:
-            self.setLocation(self._locationWidget.itemText(index))
+            self.setLocation(self._locationWidget.itemData(index))
 
     def _onNavigateUpButtonClicked(self):
         '''Navigate up a directory on button click.'''
@@ -144,19 +143,18 @@ class FilesystemBrowser(QtGui.QDialog):
     def setLocation(self, path):
         '''Set current location to *path*.'''
         model = self._filesystemWidget.model()
+        self._filesystemWidget.setRootIndex(model.pathIndex(path))
 
-        self._filesystemWidget.setRootIndex(model.index(path))
         self._locationWidget.clear()
 
-        if path != model.myComputer():
+        if path != model.root.path:
             segments = self._segmentPath(path)
             for segment in segments:
-                icon = model.fileIcon(model.index(segment))
-                self._locationWidget.addItem(icon, segment)
+                icon = model.icon(model.pathIndex(segment))
+                self._locationWidget.addItem(icon, segment, segment)
 
-        rootLabel = model.myComputer()
-        rootIcon = model.myComputer(role=QtCore.Qt.DecorationRole)
-        self._locationWidget.addItem(rootIcon, rootLabel)
+        rootIcon = model.iconFactory.icon(model.iconFactory.Computer)
+        self._locationWidget.addItem(rootIcon, model.root.name, model.root.path)
 
         if self._locationWidget.count() > 1:
             self._upButton.setEnabled(True)
