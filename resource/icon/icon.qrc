@@ -16,5 +16,6 @@
         <file alias="icon_drive">drive.png</file>
         <file alias="icon_folder">folder.png</file>
         <file alias="icon_file">file.png</file>
+        <file alias="icon_collection">collection.png</file>
     </qresource>
 </RCC>
