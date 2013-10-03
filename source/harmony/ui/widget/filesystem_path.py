@@ -5,6 +5,7 @@
 from PySide import QtGui
 
 from .string import String
+from ..filesystem_browser import FilesystemBrowser
 
 
 class FilesystemPath(String):
@@ -17,8 +18,8 @@ class FilesystemPath(String):
         self._browseButton.setToolTip('Browse for path.')
         self._headerLayout.insertWidget(2, self._browseButton, stretch=0)
 
-        self._dialog = QtGui.QFileDialog()
-        self._dialog.setFileMode(QtGui.QFileDialog.ExistingFile)
+        self._dialog = FilesystemBrowser()
+        self._dialog.setMinimumSize(900, 500)
 
     def _postConstruction(self):
         '''Perform post-construction operations.'''
@@ -28,6 +29,6 @@ class FilesystemPath(String):
     def browse(self):
         '''Show browse dialog and populate value with result.'''
         if self._dialog.exec_():
-            names = self._dialog.selectedFiles()
+            names = self._dialog.selected()
             if names:
                 self.setValue(names[0])
