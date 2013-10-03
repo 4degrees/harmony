@@ -104,7 +104,7 @@ class FilesystemBrowser(QtGui.QDialog):
     def _onActivateItem(self, index):
         '''Handle activation of item in listing.'''
         item = self._filesystemWidget.model().item(index)
-        if not item.isFile():
+        if not isinstance(item, harmony.ui.model.filesystem.FilesystemFile):
             self._acceptButton.setDisabled(True)
             self.setLocation(item.path)
 

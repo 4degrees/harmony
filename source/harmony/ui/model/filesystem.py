@@ -3,45 +3,55 @@
 # :license: See LICENSE.txt.
 
 import os
+from datetime import datetime
 
 from PySide.QtCore import Qt, QAbstractItemModel, QModelIndex, QDir, QFileInfo
 from PySide.QtGui import QIcon, QFileIconProvider
+import clique
 
 
 class FilesystemItem(object):
     '''Represent filesystem item.'''
 
-    def __init__(self, info, parent=None):
-        '''Initialise item with *info*.
-
-        *info* should be an instance of :py:class:`PySide.QtCore.QFileInfo`.
+    def __init__(self, path, parent=None):
+        '''Initialise item with *path*.
 
         *parent* is the parent :py:class:`FilesystemItem` if this item is a
         child.
 
         '''
         super(FilesystemItem, self).__init__()
-        self.info = info
+        self.path = path
         self.parent = parent
         if parent is not None:
             parent.addChild(self)
 
         self.children = []
-        self.canFetchMore = not self.isFile()
+        self._fetched = False
 
     def __repr__(self):
         '''Return representation.'''
         return '<{0} {1}>'.format(self.__class__.__name__, self.path)
 
     @property
-    def path(self):
-        '''Return absolute path.'''
-        return self.info.absoluteFilePath()
-
-    @property
     def name(self):
         '''Return name of item.'''
-        return self.info.fileName() or self.info.canonicalPath() or 'Computer'
+        return os.path.basename(self.path) or self.path
+
+    @property
+    def size(self):
+        '''Return size of item.'''
+        return os.path.getsize(self.path)
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return ''
+
+    @property
+    def modified(self):
+        '''Return last modified date of item.'''
+        return datetime.fromtimestamp(os.path.getmtime(self.path))
 
     @property
     def row(self):
@@ -64,6 +74,18 @@ class FilesystemItem(object):
         item.parent = None
         self.children.remove(item)
 
+    def canFetchMore(self):
+        '''Return whether more items can be fetched under this one.'''
+        if not self._fetched:
+            if self.mayHaveChildren():
+                return True
+
+        return False
+
+    def mayHaveChildren(self):
+        '''Return whether item may have children.'''
+        return True
+
     def fetchChildren(self):
         '''Load children.
 
@@ -72,22 +94,23 @@ class FilesystemItem(object):
         of this item and their parent will be set to this item.
 
         '''
-        if not self.canFetchMore:
+        if not self.canFetchMore():
             return
 
-        if self.path == '':
-            # Handle root drive.
-            entries = QDir.drives()
-        else:
-            directory = QDir(self.path)
-            entries = directory.entryInfoList(
-                QDir.AllEntries | QDir.NoDotAndDotDot
-            )
+        children = self._fetchChildren()
+        for child in children:
+            self.addChild(child)
 
-        for entry in entries:
-            FilesystemItem(entry, parent=self)
+        self._fetched = True
 
-        self.canFetchMore = False
+    def _fetchChildren(self):
+        '''Fetch child items.
+
+        Override in subclasses to fetch actual children and return list of
+        unparented :py:class:`FilesystemItem` instances.
+
+        '''
+        return []
 
     def refetch(self):
         '''Reload children.'''
@@ -96,19 +119,174 @@ class FilesystemItem(object):
             self.removeChild(child)
 
         # Enable children fetching
-        self.canFetchMore = not self.isFile()
+        self._fetched = False
 
-    def isFile(self):
-        '''Return whether item represents a file.'''
-        return os.path.isfile(self.path)
 
-    def isDirectory(self):
-        '''Return whether item represents a directory.'''
-        return os.path.isdir(self.path)
+class FilesystemRoot(FilesystemItem):
+    '''Represent root.'''
 
-    def isMount(self):
-        '''Return whether item represents a mount point.'''
-        return os.path.ismount(self.path)
+    def __init__(self, parent=None):
+        '''Initialise item.
+
+        *parent* is the parent :py:class:`FilesystemItem` if this item is a
+        child.
+
+        '''
+        super(FilesystemRoot, self).__init__('', parent=parent)
+
+    @property
+    def name(self):
+        '''Return name of item.'''
+        return 'Computer'
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return 'Root'
+
+    def _fetchChildren(self):
+        '''Fetch child items.'''
+        children = []
+        for entry in QDir.drives():
+            path = os.path.normpath(entry.canonicalPath())
+            children.append(FilesystemMount(path))
+
+        return children
+
+
+class FilesystemFile(FilesystemItem):
+    '''Represent file.'''
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return 'File'
+
+    def mayHaveChildren(self):
+        '''Return whether item may have children.'''
+        return False
+
+
+class FilesystemDirectory(FilesystemItem):
+    '''Represent directory.'''
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return 'Directory'
+
+    def _fetchChildren(self):
+        '''Fetch child items.'''
+        children = []
+
+        # List paths under this directory.
+        paths = []
+        for name in os.listdir(self.path):
+            paths.append(os.path.normpath(os.path.join(self.path, name)))
+
+        # Handle collections.
+        # TODO: When https://github.com/4degrees/clique/issues/4 resolved
+        # can update this to avoid extra processing.
+        collections = clique.assemble(paths, [clique.PATTERNS['frames']])
+
+        for path in paths:
+            collected = False
+
+            for collection in collections:
+                if path in collection:
+                    collected = True
+                    break
+
+            if not collected:
+                child = None
+
+                if os.path.isfile(path):
+                    child = FilesystemFile(path)
+
+                elif os.path.ismount(path):
+                    child = FilesystemMount(path)
+
+                elif os.path.isdir(path):
+                    child = FilesystemDirectory(path)
+
+                if child is not None:
+                    children.append(child)
+
+        for collection in collections:
+            children.append(FilesystemCollection(collection))
+
+        return children
+
+
+class FilesystemMount(FilesystemDirectory):
+    '''Represent mount point.'''
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return 'Mount'
+
+    @property
+    def size(self):
+        '''Return size of item.'''
+        return None
+
+    @property
+    def modified(self):
+        '''Return last modified date of item.'''
+        return None
+
+
+class FilesystemCollection(FilesystemItem):
+    '''Represent collection.'''
+
+    def __init__(self, collection, parent=None):
+        '''Initialise item with *collection*.
+
+        *collection* should be an instance of :py:class:`clique.Collection`.
+
+        *parent* is the parent :py:class:`FilesystemItem` if this item is a
+        child.
+
+        '''
+        self._collection = collection
+        super(FilesystemCollection, self).__init__(self._collection.format(),
+                                                   parent=parent)
+
+    @property
+    def type(self):
+        '''Return type of item as string.'''
+        return 'Collection'
+
+    @property
+    def size(self):
+        '''Return size of item.'''
+        return None
+
+    @property
+    def modified(self):
+        '''Return last modified date of item.'''
+        return None
+
+    def _fetchChildren(self):
+        '''Fetch child items.'''
+        children = []
+        for path in self._collection:
+            child = None
+
+            if os.path.isfile(path):
+                    child = FilesystemFile(path)
+
+            elif os.path.ismount(path):
+                child = FilesystemMount(path)
+
+            elif os.path.isdir(path):
+                child = FilesystemDirectory(path)
+
+            if child is not None:
+                children.append(child)
+
+        return children
 
 
 class Filesystem(QAbstractItemModel):
@@ -122,7 +300,7 @@ class Filesystem(QAbstractItemModel):
         self.path = path
         self.columns = ['Name', 'Size', 'Type', 'Date Modified']
         self.iconFactory = QFileIconProvider()
-        self.root = FilesystemItem(QFileInfo())
+        self.root = FilesystemRoot()
         
     def rowCount(self, parent):
         '''Return number of children *parent* index has.'''
@@ -232,16 +410,26 @@ class Filesystem(QAbstractItemModel):
 
             if column == 0:
                 return item.name
+            elif column == 1:
+                if item.size:
+                    return item.size
+            elif column == 2:
+                return item.type
+            elif column == 3:
+                if item.modified is not None:
+                    return item.modified.strftime('%c')
 
         elif role == Qt.DecorationRole:
             if column == 0:
-                icon = self.iconFactory.icon(item.info)
+                icon = self.iconFactory.icon(QFileInfo(item.path))
 
-                if icon is None:
-                    if item.isDirectory():
+                if icon is None or icon.isNull():
+                    if isinstance(item, FilesystemDirectory):
                         icon = QIcon(':icon_folder')
-                    elif item.isMount():
+                    elif isinstance(item, FilesystemMount):
                         icon = QIcon(':icon_drive')
+                    elif isinstance(item, FilesystemCollection):
+                        icon = QIcon(':icon_collection')
                     else:
                         icon = QIcon(':icon_file')
 
@@ -278,7 +466,7 @@ class Filesystem(QAbstractItemModel):
             if not item:
                 return False
 
-        return True
+        return item.mayHaveChildren()
 
     def canFetchMore(self, index):
         '''Return if more data available for *index*.'''
@@ -287,7 +475,7 @@ class Filesystem(QAbstractItemModel):
         else:
             item = index.internalPointer()
 
-        return item.canFetchMore
+        return item.canFetchMore()
 
     def fetchMore(self, index):
         '''Fetch additional data under *index*.'''
@@ -296,7 +484,7 @@ class Filesystem(QAbstractItemModel):
         else:
             item = index.internalPointer()
 
-        if item.canFetchMore:
+        if item.canFetchMore():
             current_index = len(item.children)
             item.fetchChildren()
             new_index = len(item.children) - 1
@@ -307,6 +495,6 @@ class Filesystem(QAbstractItemModel):
     def reset(self):
         '''Reset model'''
         self.beginResetModel()
-        self.root = FilesystemItem(QFileInfo())
+        self.root = FilesystemRoot()
         self.root.refetch()
         self.endResetModel()
