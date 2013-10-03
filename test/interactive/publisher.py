@@ -4,11 +4,9 @@
 
 import sys
 import time
-import pprint
 from functools import partial
 
-from PySide import QtGui, QtCore
-import jsonpointer
+from PySide import QtGui
 
 import harmony.session
 import harmony.ui.widget.factory
@@ -24,7 +22,8 @@ class Publisher(harmony.ui.publisher.Publisher):
         for index in range(5):
             time.sleep(1)
 
-        return pprint.pformat(instance)
+        return instance
+
 
 class Factory(harmony.ui.widget.factory.Factory):
     '''Customised widget factory.'''
