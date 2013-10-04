@@ -148,7 +148,7 @@ class FilesystemRoot(FilesystemItem):
         '''Fetch child items.'''
         children = []
         for entry in QDir.drives():
-            path = os.path.normpath(entry.canonicalPath())
+            path = os.path.normpath(entry.canonicalFilePath())
             children.append(FilesystemMount(path))
 
         return children
