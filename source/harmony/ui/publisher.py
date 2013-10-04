@@ -4,6 +4,7 @@
 
 import copy
 import traceback
+import pprint
 
 from PySide import QtGui, QtCore
 
@@ -170,26 +171,43 @@ class Publisher(QtGui.QDialog):
 
         else:
             process_dialog.reset()
-            QtGui.QMessageBox.information(
-                self,
-                'Publish completed',
-                'Publish completed successfully!'
-                '\n{0}'.format(worker.result or '')
-            )
 
-        self._postPublish(instance)
+            self._postPublish(instance, worker.result)
 
     def _publish(self, instance):
-        '''Publish *instance*.
+        '''Publish *instance* and return published instance.
 
         Override in subclasses to perform actual publish.
 
         '''
 
-    def _postPublish(self, instance):
-        '''Perform post publish action.'''
+    def _postPublish(self, instance, published):
+        '''Perform post publish action.
+
+        *instance* is the instance from the interface, whilst *published* is
+        the result returned from the :py:meth:`_publish` method.
+
+        '''
+        self._showPostPublishMessage(published)
+
         newInstance = self._prepareSubsequentPublish(instance)
         self._schemaDetailsArea.widget().setValue(newInstance)
+
+    def _showPostPublishMessage(self, published):
+        '''Display a publish completed message.
+
+        *published* is the returned result from the publish.
+
+        '''
+        if published:
+            published = pprint.pformat(published)
+
+        QtGui.QMessageBox.information(
+            self,
+            'Publish completed',
+            'Publish completed successfully!'
+            '\n\n{0}'.format(published or '')
+        )
 
     def _prepareSubsequentPublish(self, instance):
         '''Return copy of *instance* ready for subsequent publish.
