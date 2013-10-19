@@ -343,6 +343,14 @@ class Filesystem(QAbstractItemModel):
 
     def pathIndex(self, path):
         '''Return index of item with *path*.'''
+        if path == self.root.path:
+            return QModelIndex()
+
+        if not path.startswith(self.root.path):
+            return QModelIndex()
+
+        path = path[len(self.root.path):].lstrip(os.sep)
+
         parts = []
         while True:
             head, tail = os.path.split(path)
@@ -366,6 +374,7 @@ class Filesystem(QAbstractItemModel):
                         item = child
                         matched = True
                         break
+
                 if not matched:
                     break
 

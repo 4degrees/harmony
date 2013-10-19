@@ -12,13 +12,16 @@ import harmony.ui.model.filesystem
 class FilesystemBrowser(QtGui.QDialog):
     '''FilesystemBrowser dialog.'''
 
-    def __init__(self, parent=None):
-        '''Initialise *parent*.
+    def __init__(self, root='', parent=None):
+        '''Initialise browser with *root* path.
+
+        Use an empty *root* path to specify the computer.
 
         *parent* is the optional owner of this UI element.
 
         '''
         super(FilesystemBrowser, self).__init__(parent=parent)
+        self._root = root
         self._selected = []
         self._construct()
         self._postConstruction()
@@ -57,7 +60,9 @@ class FilesystemBrowser(QtGui.QDialog):
         self._contentSplitter.addWidget(self._filesystemWidget)
 
         proxy = harmony.ui.model.filesystem.FilesystemSortProxy(self)
-        model = harmony.ui.model.filesystem.Filesystem(parent=self)
+        model = harmony.ui.model.filesystem.Filesystem(
+            path=self._root, parent=self
+        )
         proxy.setSourceModel(model)
         self._filesystemWidget.setModel(proxy)
         self._filesystemWidget.setSortingEnabled(True)
@@ -90,7 +95,7 @@ class FilesystemBrowser(QtGui.QDialog):
         self._acceptButton.clicked.connect(self.accept)
         self._cancelButton.clicked.connect(self.reject)
 
-        self.setLocation('')
+        self.setLocation(self._root)
 
         self._filesystemWidget.horizontalHeader().setResizeMode(
             QtGui.QHeaderView.ResizeToContents
@@ -148,18 +153,30 @@ class FilesystemBrowser(QtGui.QDialog):
         return parts
 
     def setLocation(self, path):
-        '''Set current location to *path*.'''
+        '''Set current location to *path*.
+
+        *path* must be the same as root or under the root.
+
+        '''
         model = self._filesystemWidget.model()
         self._filesystemWidget.setRootIndex(model.pathIndex(path))
 
         self._locationWidget.clear()
 
-        if path != model.root.path:
-            segments = self._segmentPath(path)
-            for segment in segments:
-                icon = model.icon(model.pathIndex(segment))
-                self._locationWidget.addItem(icon, segment, segment)
+        if not path.startswith(model.root.path):
+            raise ValueError('Location must be root or under root.')
 
+        path = path[len(model.root.path):].lstrip(os.sep)
+
+        # Add history entry for each segment.
+        segments = self._segmentPath(path)
+        for segment in segments:
+            segment_path = os.path.join(model.root.path, segment)
+            icon = model.icon(model.pathIndex(segment_path))
+            segment = os.path.join(model.root.name, segment)
+            self._locationWidget.addItem(icon, segment, segment)
+
+        # Add root.
         rootIcon = model.iconFactory.icon(model.iconFactory.Computer)
         if rootIcon is None:
             rootIcon = QtGui.QIcon(':icon_folder')
