@@ -29,6 +29,6 @@ class FilesystemPath(String):
     def browse(self):
         '''Show browse dialog and populate value with result.'''
         if self._dialog.exec_():
-            names = self._dialog.selected()
-            if names:
+            selected = self._dialog.selected()
+            if selected:
                 self.setValue(names[0])

@@ -10,17 +10,17 @@ from PySide.QtGui import QIcon, QFileIconProvider, QSortFilterProxyModel
 import clique
 
 
-class FilesystemItem(object):
+class Item(object):
     '''Represent filesystem item.'''
 
     def __init__(self, path, parent=None):
         '''Initialise item with *path*.
 
-        *parent* is the parent :py:class:`FilesystemItem` if this item is a
+        *parent* is the parent :py:class:`Item` if this item is a
         child.
 
         '''
-        super(FilesystemItem, self).__init__()
+        super(Item, self).__init__()
         self.path = path
         self.parent = parent
         if parent is not None:
@@ -90,7 +90,7 @@ class FilesystemItem(object):
         '''Load children.
 
         Will only fetch children whilst canFetchMore is True. Each child
-        will be added as a new :py:class:`FilesystemItem` to the children list
+        will be added as a new :py:class:`Item` to the children list
         of this item and their parent will be set to this item.
 
         '''
@@ -107,7 +107,7 @@ class FilesystemItem(object):
         '''Fetch child items.
 
         Override in subclasses to fetch actual children and return list of
-        unparented :py:class:`FilesystemItem` instances.
+        unparented :py:class:`Item` instances.
 
         '''
         return []
@@ -122,17 +122,17 @@ class FilesystemItem(object):
         self._fetched = False
 
 
-class FilesystemRoot(FilesystemItem):
+class Computer(Item):
     '''Represent root.'''
 
     def __init__(self, parent=None):
         '''Initialise item.
 
-        *parent* is the parent :py:class:`FilesystemItem` if this item is a
+        *parent* is the parent :py:class:`Item` if this item is a
         child.
 
         '''
-        super(FilesystemRoot, self).__init__('', parent=parent)
+        super(Computer, self).__init__('', parent=parent)
 
     @property
     def name(self):
@@ -149,12 +149,12 @@ class FilesystemRoot(FilesystemItem):
         children = []
         for entry in QDir.drives():
             path = os.path.normpath(entry.canonicalFilePath())
-            children.append(FilesystemMount(path))
+            children.append(Mount(path))
 
         return children
 
 
-class FilesystemFile(FilesystemItem):
+class File(Item):
     '''Represent file.'''
 
     @property
@@ -167,7 +167,7 @@ class FilesystemFile(FilesystemItem):
         return False
 
 
-class FilesystemDirectory(FilesystemItem):
+class Directory(Item):
     '''Represent directory.'''
 
     @property
@@ -191,24 +191,24 @@ class FilesystemDirectory(FilesystemItem):
 
         for path in remainder:
             if os.path.isfile(path):
-                child = FilesystemFile(path)
+                child = File(path)
 
             elif os.path.ismount(path):
-                child = FilesystemMount(path)
+                child = Mount(path)
 
             elif os.path.isdir(path):
-                child = FilesystemDirectory(path)
+                child = Directory(path)
 
             if child is not None:
                 children.append(child)
 
         for collection in collections:
-            children.append(FilesystemCollection(collection))
+            children.append(Collection(collection))
 
         return children
 
 
-class FilesystemMount(FilesystemDirectory):
+class Mount(Directory):
     '''Represent mount point.'''
 
     @property
@@ -227,7 +227,7 @@ class FilesystemMount(FilesystemDirectory):
         return None
 
 
-class FilesystemCollection(FilesystemItem):
+class Collection(Item):
     '''Represent collection.'''
 
     def __init__(self, collection, parent=None):
@@ -235,13 +235,13 @@ class FilesystemCollection(FilesystemItem):
 
         *collection* should be an instance of :py:class:`clique.Collection`.
 
-        *parent* is the parent :py:class:`FilesystemItem` if this item is a
+        *parent* is the parent :py:class:`Item` if this item is a
         child.
 
         '''
         self._collection = collection
-        super(FilesystemCollection, self).__init__(self._collection.format(),
-                                                   parent=parent)
+        super(Collection, self).__init__(self._collection.format(),
+                                        parent=parent)
 
     @property
     def type(self):
@@ -265,13 +265,13 @@ class FilesystemCollection(FilesystemItem):
             child = None
 
             if os.path.isfile(path):
-                    child = FilesystemFile(path)
+                    child = File(path)
 
             elif os.path.ismount(path):
-                child = FilesystemMount(path)
+                child = Mount(path)
 
             elif os.path.isdir(path):
-                child = FilesystemDirectory(path)
+                child = Directory(path)
 
             if child is not None:
                 children.append(child)
@@ -290,7 +290,7 @@ class Filesystem(QAbstractItemModel):
         self.path = path
         self.columns = ['Name', 'Size', 'Type', 'Date Modified']
         self.iconFactory = QFileIconProvider()
-        self.root = FilesystemRoot()
+        self.root = Computer()
 
     def rowCount(self, parent):
         '''Return number of children *parent* index has.'''
@@ -414,11 +414,11 @@ class Filesystem(QAbstractItemModel):
                 icon = self.iconFactory.icon(QFileInfo(item.path))
 
                 if icon is None or icon.isNull():
-                    if isinstance(item, FilesystemDirectory):
+                    if isinstance(item, Directory):
                         icon = QIcon(':icon_folder')
-                    elif isinstance(item, FilesystemMount):
+                    elif isinstance(item, Mount):
                         icon = QIcon(':icon_drive')
-                    elif isinstance(item, FilesystemCollection):
+                    elif isinstance(item, Collection):
                         icon = QIcon(':icon_collection')
                     else:
                         icon = QIcon(':icon_file')
@@ -485,7 +485,7 @@ class Filesystem(QAbstractItemModel):
     def reset(self):
         '''Reset model'''
         self.beginResetModel()
-        self.root = FilesystemRoot()
+        self.root = Computer()
         self.root.refetch()
         self.endResetModel()
 
@@ -500,12 +500,12 @@ class FilesystemSortProxy(QSortFilterProxyModel):
             leftItem = sourceModel.item(left)
             rightItem = sourceModel.item(right)
 
-            if (isinstance(leftItem, FilesystemDirectory)
-                and not isinstance(rightItem, FilesystemDirectory)):
+            if (isinstance(leftItem, Directory)
+                and not isinstance(rightItem, Directory)):
                 return self.sortOrder() == Qt.AscendingOrder
 
-            elif (not isinstance(leftItem, FilesystemDirectory)
-                and isinstance(rightItem, FilesystemDirectory)):
+            elif (not isinstance(leftItem, Directory)
+                and isinstance(rightItem, Directory)):
                 return self.sortOrder() == Qt.DescendingOrder
 
         return super(FilesystemSortProxy, self).lessThan(left, right)
