@@ -298,10 +298,9 @@ class Filesystem(QAbstractItemModel):
     def __init__(self, path='', parent=None):
         '''Initialise with root *path*.'''
         super(Filesystem, self).__init__(parent=parent)
-        self.path = path
+        self.root = ItemFactory(path)
         self.columns = ['Name', 'Size', 'Type', 'Date Modified']
         self.iconFactory = QFileIconProvider()
-        self.root = Computer()
 
     def rowCount(self, parent):
         '''Return number of children *parent* index has.'''

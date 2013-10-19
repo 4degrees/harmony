@@ -57,7 +57,7 @@ class FilesystemBrowser(QtGui.QDialog):
         self._contentSplitter.addWidget(self._filesystemWidget)
 
         proxy = harmony.ui.model.filesystem.FilesystemSortProxy(self)
-        model = harmony.ui.model.filesystem.Filesystem(self)
+        model = harmony.ui.model.filesystem.Filesystem(parent=self)
         proxy.setSourceModel(model)
         self._filesystemWidget.setModel(proxy)
         self._filesystemWidget.setSortingEnabled(True)
