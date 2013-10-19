@@ -10,6 +10,29 @@ from PySide.QtGui import QIcon, QFileIconProvider, QSortFilterProxyModel
 import clique
 
 
+def ItemFactory(path):
+    '''Return appropriate :py:class:`Item` instance for *path*.
+
+    If *path* is null then return Computer root.
+
+    '''
+    if not path:
+        return Computer()
+
+    elif os.path.isfile(path):
+        return File(path)
+
+    elif os.path.ismount(path):
+        return Mount(path)
+
+    elif os.path.isdir(path):
+        return Directory(path)
+
+    else:
+        raise ValueError('Could not determine correct type for path: {0}'
+                         .format(path))
+
+
 class Item(object):
     '''Represent filesystem item.'''
 
@@ -190,16 +213,11 @@ class Directory(Item):
         )
 
         for path in remainder:
-            if os.path.isfile(path):
-                child = File(path)
-
-            elif os.path.ismount(path):
-                child = Mount(path)
-
-            elif os.path.isdir(path):
-                child = Directory(path)
-
-            if child is not None:
+            try:
+                child = ItemFactory(path)
+            except ValueError:
+                pass
+            else:
                 children.append(child)
 
         for collection in collections:
@@ -262,18 +280,11 @@ class Collection(Item):
         '''Fetch child items.'''
         children = []
         for path in self._collection:
-            child = None
-
-            if os.path.isfile(path):
-                    child = File(path)
-
-            elif os.path.ismount(path):
-                child = Mount(path)
-
-            elif os.path.isdir(path):
-                child = Directory(path)
-
-            if child is not None:
+            try:
+                child = ItemFactory(path)
+            except ValueError:
+                pass
+            else:
                 children.append(child)
 
         return children
