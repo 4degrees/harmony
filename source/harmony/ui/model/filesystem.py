@@ -336,11 +336,12 @@ class Filesystem(QAbstractItemModel):
         else:
             item = parent.internalPointer()
 
-        child = item.children[row]
-        if child:
-            return self.createIndex(row, column, child)
-        else:
+        try:
+            child = item.children[row]
+        except IndexError:
             return QModelIndex()
+        else:
+            return self.createIndex(row, column, child)
 
     def pathIndex(self, path):
         '''Return index of item with *path*.'''
@@ -370,6 +371,7 @@ class Filesystem(QAbstractItemModel):
 
             for count, part in enumerate(parts):
                 matched = False
+
                 for child in item.children:
                     if child.name == part:
                         item = child
