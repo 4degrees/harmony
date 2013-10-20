@@ -45,7 +45,8 @@ class Item(object):
         '''
         super(Item, self).__init__()
         self.path = path
-        self.parent = parent
+
+        self.parent = None
         if parent is not None:
             parent.addChild(self)
 
