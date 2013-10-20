@@ -509,7 +509,6 @@ class Filesystem(QAbstractItemModel):
     def reset(self):
         '''Reset model'''
         self.beginResetModel()
-        self.root = Computer()
         self.root.refetch()
         self.endResetModel()
 
