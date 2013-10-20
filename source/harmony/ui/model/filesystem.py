@@ -392,9 +392,11 @@ class Filesystem(QAbstractItemModel):
             return QModelIndex()
 
         item = index.internalPointer()
-        parent = item.parent
+        if not item:
+            return QModelIndex()
 
-        if parent == self.root:
+        parent = item.parent
+        if not parent or parent == self.root:
             return QModelIndex()
 
         return self.createIndex(parent.row, 0, parent)
