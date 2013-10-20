@@ -260,7 +260,7 @@ class Collection(Item):
         '''
         self._collection = collection
         super(Collection, self).__init__(self._collection.format(),
-                                        parent=parent)
+                                         parent=parent)
 
     @property
     def type(self):
