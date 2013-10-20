@@ -140,16 +140,22 @@ class FilesystemBrowser(QtGui.QDialog):
     def _segmentPath(self, path):
         '''Return list of valid *path* segments.'''
         parts = []
-        while True:
-            head, tail = os.path.split(path)
-            if path:
-                parts.append(path)
+        model = self._filesystemWidget.model()
 
-            if head == path:
+        # Separate root path from remainder.
+        remainder = path[len(model.root.path):].lstrip(os.sep)
+
+        while True:
+            if remainder:
+                parts.append(remainder)
+
+            head, tail = os.path.split(remainder)
+            if head == remainder:
                 break
 
-            path = head
+            remainder = head
 
+        parts.append(model.root.path)
         return parts
 
     def setLocation(self, path):
@@ -157,31 +163,40 @@ class FilesystemBrowser(QtGui.QDialog):
 
         *path* must be the same as root or under the root.
 
+        .. note::
+
+            Comparisons are case-sensitive. If you set the root as 'D:\' then
+            location can be set as 'D:\folder' *not* 'd:\folder'.
+
         '''
         model = self._filesystemWidget.model()
-        self._filesystemWidget.setRootIndex(model.pathIndex(path))
-
-        self._locationWidget.clear()
 
         if not path.startswith(model.root.path):
             raise ValueError('Location must be root or under root.')
 
-        path = path[len(model.root.path):].lstrip(os.sep)
+        # Ensure children for each segment in path are loaded.
+        segments = self._segmentPath(path)
+        for segment in reversed(segments):
+            pathIndex = model.pathIndex(segment)
+            model.fetchMore(pathIndex)
+
+        self._filesystemWidget.setRootIndex(model.pathIndex(path))
+        self._locationWidget.clear()
 
         # Add history entry for each segment.
-        segments = self._segmentPath(path)
         for segment in segments:
-            segment_path = os.path.join(model.root.path, segment)
-            icon = model.icon(model.pathIndex(segment_path))
-            segment = os.path.join(model.root.name, segment)
-            self._locationWidget.addItem(icon, segment, segment)
+            if not segment:
+                icon = model.iconFactory.icon(model.iconFactory.Computer)
+                if icon is None:
+                    icon = QtGui.QIcon(':icon_folder')
 
-        # Add root.
-        rootIcon = model.iconFactory.icon(model.iconFactory.Computer)
-        if rootIcon is None:
-            rootIcon = QtGui.QIcon(':icon_folder')
+                self._locationWidget.addItem(icon, model.root.name, segment)
 
-        self._locationWidget.addItem(rootIcon, model.root.name, model.root.path)
+            else:
+                segment_path = os.path.join(model.root.path, segment)
+                icon = model.icon(model.pathIndex(segment_path))
+                segment = os.path.join(model.root.name, segment)
+                self._locationWidget.addItem(icon, segment, segment)
 
         if self._locationWidget.count() > 1:
             self._upButton.setEnabled(True)
