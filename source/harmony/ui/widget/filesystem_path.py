@@ -31,4 +31,4 @@ class FilesystemPath(String):
         if self._dialog.exec_():
             selected = self._dialog.selected()
             if selected:
-                self.setValue(names[0])
+                self.setValue(selected[0])
