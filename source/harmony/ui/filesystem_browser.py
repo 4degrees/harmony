@@ -188,15 +188,18 @@ class FilesystemBrowser(QtGui.QDialog):
 
         # Add history entry for each segment.
         for segment in segments:
-            if not segment:
+            index = model.pathIndex(segment)
+            if not index.isValid():
+                # Root item.
                 icon = model.iconFactory.icon(model.iconFactory.Computer)
                 if icon is None:
                     icon = QtGui.QIcon(':icon_folder')
 
-                self._locationWidget.addItem(icon, model.root.name, segment)
-
+                self._locationWidget.addItem(
+                    icon, model.root.path or model.root.name, model.root.path
+                )
             else:
-                icon = model.icon(model.pathIndex(segment))
+                icon = model.icon(index)
                 self._locationWidget.addItem(icon, segment, segment)
 
         if self._locationWidget.count() > 1:
