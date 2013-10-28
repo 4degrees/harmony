@@ -143,9 +143,12 @@ class FilesystemBrowser(QtGui.QDialog):
         model = self._filesystemWidget.model()
 
         # Separate root path from remainder.
-        remainder = path[len(model.root.path):].lstrip(os.sep)
+        remainder = path
 
         while True:
+            if remainder == model.root.path:
+                break
+
             if remainder:
                 parts.append(remainder)
 
@@ -193,9 +196,7 @@ class FilesystemBrowser(QtGui.QDialog):
                 self._locationWidget.addItem(icon, model.root.name, segment)
 
             else:
-                segment_path = os.path.join(model.root.path, segment)
-                icon = model.icon(model.pathIndex(segment_path))
-                segment = os.path.join(model.root.name, segment)
+                icon = model.icon(model.pathIndex(segment))
                 self._locationWidget.addItem(icon, segment, segment)
 
         if self._locationWidget.count() > 1:

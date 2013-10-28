@@ -351,10 +351,11 @@ class Filesystem(QAbstractItemModel):
         if not path.startswith(self.root.path):
             return QModelIndex()
 
-        path = path[len(self.root.path):].lstrip(os.sep)
-
         parts = []
         while True:
+            if path == self.root.path:
+                break
+
             head, tail = os.path.split(path)
             if head == path:
                 if path:
