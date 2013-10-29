@@ -12,13 +12,16 @@ import harmony.ui.model.filesystem
 class FilesystemBrowser(QtGui.QDialog):
     '''FilesystemBrowser dialog.'''
 
-    def __init__(self, parent=None):
-        '''Initialise *parent*.
+    def __init__(self, root='', parent=None):
+        '''Initialise browser with *root* path.
+
+        Use an empty *root* path to specify the computer.
 
         *parent* is the optional owner of this UI element.
 
         '''
         super(FilesystemBrowser, self).__init__(parent=parent)
+        self._root = root
         self._selected = []
         self._construct()
         self._postConstruction()
@@ -57,7 +60,9 @@ class FilesystemBrowser(QtGui.QDialog):
         self._contentSplitter.addWidget(self._filesystemWidget)
 
         proxy = harmony.ui.model.filesystem.FilesystemSortProxy(self)
-        model = harmony.ui.model.filesystem.Filesystem(self)
+        model = harmony.ui.model.filesystem.Filesystem(
+            path=self._root, parent=self
+        )
         proxy.setSourceModel(model)
         self._filesystemWidget.setModel(proxy)
         self._filesystemWidget.setSortingEnabled(True)
@@ -90,7 +95,7 @@ class FilesystemBrowser(QtGui.QDialog):
         self._acceptButton.clicked.connect(self.accept)
         self._cancelButton.clicked.connect(self.reject)
 
-        self.setLocation('')
+        self.setLocation(self._root)
 
         self._filesystemWidget.horizontalHeader().setResizeMode(
             QtGui.QHeaderView.ResizeToContents
@@ -111,7 +116,7 @@ class FilesystemBrowser(QtGui.QDialog):
     def _onActivateItem(self, index):
         '''Handle activation of item in listing.'''
         item = self._filesystemWidget.model().item(index)
-        if not isinstance(item, harmony.ui.model.filesystem.FilesystemFile):
+        if not isinstance(item, harmony.ui.model.filesystem.File):
             self._acceptButton.setDisabled(True)
             self.setLocation(item.path)
 
@@ -135,36 +140,67 @@ class FilesystemBrowser(QtGui.QDialog):
     def _segmentPath(self, path):
         '''Return list of valid *path* segments.'''
         parts = []
-        while True:
-            head, tail = os.path.split(path)
-            if path:
-                parts.append(path)
+        model = self._filesystemWidget.model()
 
-            if head == path:
+        # Separate root path from remainder.
+        remainder = path
+
+        while True:
+            if remainder == model.root.path:
                 break
 
-            path = head
+            if remainder:
+                parts.append(remainder)
 
+            head, tail = os.path.split(remainder)
+            if head == remainder:
+                break
+
+            remainder = head
+
+        parts.append(model.root.path)
         return parts
 
     def setLocation(self, path):
-        '''Set current location to *path*.'''
-        model = self._filesystemWidget.model()
-        self._filesystemWidget.setRootIndex(model.pathIndex(path))
+        '''Set current location to *path*.
 
+        *path* must be the same as root or under the root.
+
+        .. note::
+
+            Comparisons are case-sensitive. If you set the root as 'D:\' then
+            location can be set as 'D:\folder' *not* 'd:\folder'.
+
+        '''
+        model = self._filesystemWidget.model()
+
+        if not path.startswith(model.root.path):
+            raise ValueError('Location must be root or under root.')
+
+        # Ensure children for each segment in path are loaded.
+        segments = self._segmentPath(path)
+        for segment in reversed(segments):
+            pathIndex = model.pathIndex(segment)
+            model.fetchMore(pathIndex)
+
+        self._filesystemWidget.setRootIndex(model.pathIndex(path))
         self._locationWidget.clear()
 
-        if path != model.root.path:
-            segments = self._segmentPath(path)
-            for segment in segments:
-                icon = model.icon(model.pathIndex(segment))
+        # Add history entry for each segment.
+        for segment in segments:
+            index = model.pathIndex(segment)
+            if not index.isValid():
+                # Root item.
+                icon = model.iconFactory.icon(model.iconFactory.Computer)
+                if icon is None:
+                    icon = QtGui.QIcon(':icon_folder')
+
+                self._locationWidget.addItem(
+                    icon, model.root.path or model.root.name, model.root.path
+                )
+            else:
+                icon = model.icon(index)
                 self._locationWidget.addItem(icon, segment, segment)
-
-        rootIcon = model.iconFactory.icon(model.iconFactory.Computer)
-        if rootIcon is None:
-            rootIcon = QtGui.QIcon(':icon_folder')
-
-        self._locationWidget.addItem(rootIcon, model.root.name, model.root.path)
 
         if self._locationWidget.count() > 1:
             self._upButton.setEnabled(True)
