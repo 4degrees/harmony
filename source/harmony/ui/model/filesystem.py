@@ -521,14 +521,6 @@ class FilesystemSortProxy(QSortFilterProxyModel):
 
         return super(FilesystemSortProxy, self).lessThan(left, right)
 
-    def rowCount(self, parent):
-        '''Return number of children *parent* index has.'''
-        sourceModel = self.sourceModel()
-        if not sourceModel:
-            return 0
-
-        return sourceModel.rowCount(self.mapToSource(parent))
-
     @property
     def root(self):
         '''Return root of model.'''
