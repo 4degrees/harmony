@@ -64,6 +64,8 @@ class FilesystemBrowser(QtGui.QDialog):
             path=self._root, parent=self
         )
         proxy.setSourceModel(model)
+        proxy.setDynamicSortFilter(True)
+
         self._filesystemWidget.setModel(proxy)
         self._filesystemWidget.setSortingEnabled(True)
 

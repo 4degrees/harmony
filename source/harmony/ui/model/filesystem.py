@@ -36,21 +36,13 @@ def ItemFactory(path):
 class Item(object):
     '''Represent filesystem item.'''
 
-    def __init__(self, path, parent=None):
-        '''Initialise item with *path*.
-
-        *parent* is the parent :py:class:`Item` if this item is a
-        child.
-
-        '''
+    def __init__(self, path):
+        '''Initialise item with *path*.'''
         super(Item, self).__init__()
         self.path = path
 
-        self.parent = None
-        if parent is not None:
-            parent.addChild(self)
-
         self.children = []
+        self.parent = None
         self._fetched = False
 
     def __repr__(self):
@@ -111,27 +103,29 @@ class Item(object):
         return True
 
     def fetchChildren(self):
-        '''Load children.
+        '''Fetch and return new children.
 
-        Will only fetch children whilst canFetchMore is True. Each child
-        will be added as a new :py:class:`Item` to the children list
-        of this item and their parent will be set to this item.
+        Will only fetch children whilst canFetchMore is True.
+
+        .. note::
+
+            It is the caller's responsibility to add each fetched child to this
+            parent if desired using :py:meth:`Item.addChild`.
 
         '''
         if not self.canFetchMore():
-            return
+            return []
 
         children = self._fetchChildren()
-        for child in children:
-            self.addChild(child)
-
         self._fetched = True
 
+        return children
+
     def _fetchChildren(self):
-        '''Fetch child items.
+        '''Fetch and return new child items.
 
         Override in subclasses to fetch actual children and return list of
-        unparented :py:class:`Item` instances.
+        *unparented* :py:class:`Item` instances.
 
         '''
         return []
@@ -149,14 +143,9 @@ class Item(object):
 class Computer(Item):
     '''Represent root.'''
 
-    def __init__(self, parent=None):
-        '''Initialise item.
-
-        *parent* is the parent :py:class:`Item` if this item is a
-        child.
-
-        '''
-        super(Computer, self).__init__('', parent=parent)
+    def __init__(self):
+        '''Initialise item.'''
+        super(Computer, self).__init__('')
 
     @property
     def name(self):
@@ -169,7 +158,7 @@ class Computer(Item):
         return 'Root'
 
     def _fetchChildren(self):
-        '''Fetch child items.'''
+        '''Fetch and return new child items.'''
         children = []
         for entry in QDir.drives():
             path = os.path.normpath(entry.canonicalFilePath())
@@ -200,7 +189,7 @@ class Directory(Item):
         return 'Directory'
 
     def _fetchChildren(self):
-        '''Fetch child items.'''
+        '''Fetch and return new child items.'''
         children = []
 
         # List paths under this directory.
@@ -249,18 +238,14 @@ class Mount(Directory):
 class Collection(Item):
     '''Represent collection.'''
 
-    def __init__(self, collection, parent=None):
+    def __init__(self, collection):
         '''Initialise item with *collection*.
 
         *collection* should be an instance of :py:class:`clique.Collection`.
 
-        *parent* is the parent :py:class:`Item` if this item is a
-        child.
-
         '''
         self._collection = collection
-        super(Collection, self).__init__(self._collection.format(),
-                                         parent=parent)
+        super(Collection, self).__init__(self._collection.format())
 
     @property
     def type(self):
@@ -278,7 +263,7 @@ class Collection(Item):
         return None
 
     def _fetchChildren(self):
-        '''Fetch child items.'''
+        '''Fetch and return new child items.'''
         children = []
         for path in self._collection:
             try:
@@ -500,11 +485,13 @@ class Filesystem(QAbstractItemModel):
             item = index.internalPointer()
 
         if item.canFetchMore():
-            current_index = len(item.children)
-            item.fetchChildren()
-            new_index = len(item.children) - 1
-            if new_index >= current_index:
-                self.beginInsertRows(index, current_index, new_index)
+            startIndex = len(item.children)
+            additionalChildren = item.fetchChildren()
+            endIndex = startIndex + len(additionalChildren) - 1
+            if endIndex >= startIndex:
+                self.beginInsertRows(index, startIndex, endIndex)
+                for newChild in additionalChildren:
+                    item.addChild(newChild)
                 self.endInsertRows()
 
     def reset(self):
@@ -533,14 +520,6 @@ class FilesystemSortProxy(QSortFilterProxyModel):
                 return self.sortOrder() == Qt.DescendingOrder
 
         return super(FilesystemSortProxy, self).lessThan(left, right)
-
-    def rowCount(self, parent):
-        '''Return number of children *parent* index has.'''
-        sourceModel = self.sourceModel()
-        if not sourceModel:
-            return 0
-
-        return sourceModel.rowCount(self.mapToSource(parent))
 
     @property
     def root(self):
