@@ -127,9 +127,13 @@ class Container(Standard):
         *value* must be a dictionary with each key corresponding to the name
         of a child of this container and that key's value the value to set for
         the child. If a child is not included in *value* then it will have its
-        value set to None.
+        value set to None. *value* may also be None, in which case all children
+        will have their values set to None.
 
         '''
+        if value is None:
+            value = {}
+
         children_by_name = {}
         for child in self.children:
             children_by_name[child['name']] = child['widget']
