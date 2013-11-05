@@ -130,6 +130,9 @@ class Container(Standard):
         value set to None.
 
         '''
+        if value is None:
+            value = {}
+
         children_by_name = {}
         for child in self.children:
             children_by_name[child['name']] = child['widget']
