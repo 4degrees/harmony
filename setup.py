@@ -5,11 +5,8 @@
 import os
 import re
 
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
 
 
 class PyTest(TestCommand):
