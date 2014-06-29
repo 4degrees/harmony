@@ -51,16 +51,15 @@ setup(
     package_dir={
         '': 'source'
     },
-    dependency_links=[
-        'https://github.com/Julian/jsonschema/tarball/292a256b918af1e567982bb801c427cf4ca5b9fe#egg-jsonschema-2.0.1a'
-    ],
     install_requires=[
-        'jsonschema >= 2.0.1',
-        'jsonpointer >= 1.0',
-        'PySide >= 1.1.1',
-        'Clique >= 1.1.0'
+        'jsonschema >= 2.3.0, < 3',
+        'jsonpointer >= 1.3, < 2',
+        'PySide >= 1.1.1, < 2',
+        'Clique >= 1.2.0, < 2'
     ],
-    tests_require=['pytest >= 2.3.5'],
+    tests_require=[
+        'pytest >= 2.3.5, < 3'
+    ],
     cmdclass={
         'test': PyTest
     },
