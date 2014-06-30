@@ -3,5 +3,13 @@
 # :license: See LICENSE.txt.
 
 
-class SchemaConflictError(Exception):
+class HarmonyError(Exception):
+    '''Raise when a general Harmony error occurs.'''
+
+
+class SchemaConflictError(HarmonyError):
     '''Raise when a schema conflict occurs.'''
+
+
+class PublisherError(HarmonyError):
+    '''Raise when a general publisher error occurs.'''

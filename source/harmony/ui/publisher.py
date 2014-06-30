@@ -10,10 +10,13 @@ from PySide import QtGui, QtCore
 
 import harmony.ui.error_tree
 import harmony.ui.worker
+import harmony.error
 
 
 class Publisher(QtGui.QDialog):
     '''Publisher dialog.'''
+
+    valueChanged = QtCore.Signal()
 
     def __init__(self, session, factory, parent=None):
         '''Initialise with *session*, widget *factory* and *parent*.
@@ -102,6 +105,40 @@ class Publisher(QtGui.QDialog):
         instance = self._session.instantiate(schema)
         schemaDetails.setValue(instance)
 
+    def setValue(self, value):
+        '''Set *value* of current publisher data.
+
+        *value* should be appropriate for the top most widget in the publisher,
+        as specified by the configured widget factory. Typically this will be
+        a dictionary.
+
+        Raise :py:exc:`harmony.ui.PublisherError` if no schema widget found to
+        set value on.
+
+        '''
+        widget = self._schemaDetailsArea.widget()
+        if widget:
+            widget.setValue(value)
+        else:
+            raise harmony.error.PublisherError(
+                'Cannot set value when no schema widget defined.'
+            )
+
+    def value(self):
+        '''Return current value of publisher data.
+
+        Raise :py:exc:`harmony.ui.PublisherError` if no schema widget found to
+        retrieve value from.
+
+        '''
+        widget = self._schemaDetailsArea.widget()
+        if widget:
+            return widget.value()
+        else:
+            raise harmony.error.PublisherError(
+                'Cannot retrieve value when no schema widget defined.'
+            )
+
     def _onValueChanged(self):
         '''Handle change in value.'''
         schema = self._schemaSelector.itemData(
@@ -115,6 +152,9 @@ class Publisher(QtGui.QDialog):
 
         instance = self._schemaDetailsArea.widget().value()
         self.validate(instance, schema)
+
+        # Emit value changed for publisher.
+        self.valueChanged.emit()
 
     def validate(self, instance, schema):
         '''Validate *instance* against *schema* and update UI state.'''
