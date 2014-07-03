@@ -112,6 +112,12 @@ class Publisher(QtGui.QDialog):
         as specified by the configured widget factory. Typically this will be
         a dictionary.
 
+        .. note::
+
+            The *value* must be comprehensive as it will override any currently
+            set value entirely. To set just one part of a structured value,
+            request the current value, modify it and then set.
+
         Raise :py:exc:`harmony.ui.PublisherError` if no schema widget found to
         set value on.
 
