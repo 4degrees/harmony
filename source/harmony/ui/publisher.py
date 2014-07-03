@@ -118,8 +118,8 @@ class Publisher(QtGui.QDialog):
             set value entirely. To set just one part of a structured value,
             request the current value, modify it and then set.
 
-        Raise :py:exc:`harmony.ui.PublisherError` if no schema widget found to
-        set value on.
+        Raise :py:exc:`harmony.error.PublisherError` if no schema widget found
+        to set value on.
 
         '''
         widget = self._schemaDetailsArea.widget()
@@ -133,8 +133,8 @@ class Publisher(QtGui.QDialog):
     def value(self):
         '''Return current value of publisher data.
 
-        Raise :py:exc:`harmony.ui.PublisherError` if no schema widget found to
-        retrieve value from.
+        Raise :py:exc:`harmony.error.PublisherError` if no schema widget found
+        to retrieve value from.
 
         '''
         widget = self._schemaDetailsArea.widget()
