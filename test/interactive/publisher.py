@@ -147,6 +147,10 @@ def main(arguments=None):
     dialog.resize(600, 800)
     dialog.show()
 
+    value = dialog.value()
+    value['note'] = 'Hello world!'
+    dialog.setValue(value)
+
     sys.exit(application.exec_())
 
 
