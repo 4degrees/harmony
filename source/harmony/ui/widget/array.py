@@ -74,14 +74,14 @@ class Array(Standard):
 
         self._addButton = QtGui.QPushButton('Add')
         self._addButton.setToolTip('Add a new item to the list.')
-        plusIcon = QtGui.QPixmap(':icon_plus')
+        plusIcon = QtGui.QPixmap(':harmony/icon/plus')
         self._addButton.setIcon(plusIcon)
         self._addButton.setIconSize(plusIcon.size())
         self._footer.layout().addWidget(self._addButton)
 
         self._removeButton = QtGui.QPushButton('Remove')
         self._removeButton.setToolTip('Remove selected items from list.')
-        minusIcon = QtGui.QPixmap(':icon_minus')
+        minusIcon = QtGui.QPixmap(':harmony/icon/minus')
         self._removeButton.setIcon(minusIcon)
         self._removeButton.setIconSize(minusIcon.size())
         self._footer.layout().addWidget(self._removeButton)

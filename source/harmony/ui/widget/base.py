@@ -4,8 +4,6 @@
 
 from PySide import QtGui, QtCore
 
-from .. import icon
-
 
 class Widget(QtGui.QFrame):
     '''Base widget.
@@ -82,7 +80,7 @@ class Widget(QtGui.QFrame):
         self._error = value
 
         if value:
-            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_error'))
+            self._errorIndicator.setPixmap(QtGui.QPixmap(':harmony/icon/error'))
 
             if isinstance(value, basestring):
                 self._errorIndicator.setToolTip(value)
@@ -94,7 +92,7 @@ class Widget(QtGui.QFrame):
                 self._errorIndicator.setToolTip('A validation error occurred.')
 
         else:
-            self._errorIndicator.setPixmap(QtGui.QPixmap(':icon_blank'))
+            self._errorIndicator.setPixmap(QtGui.QPixmap(':harmony/icon/blank'))
             self._errorIndicator.setToolTip('')
 
     def value(self):

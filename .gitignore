@@ -1,5 +1,9 @@
+# Project specific
+source/harmony/resource.py
+
 # General
 *.py[cod]
+Thumbs.db
 
 # Packages
 *.egg
@@ -15,14 +19,15 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-__pycache__
 
 # Installer logs
 pip-log.txt
 
 # Unit test / coverage reports
 .coverage
-.tox
+
+# Translations
+*.mo
 
 # Development
 .project
