@@ -1,3 +1,4 @@
 include LICENSE.txt
 include README.rst
+include source/harmony/schema/meta.json
 recursive-include resource *.png *.qrc *.json

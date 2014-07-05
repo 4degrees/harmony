@@ -166,6 +166,9 @@ setup(
     package_dir={
         '': 'source'
     },
+    package_data={
+        'harmony.schema': ['meta.json']
+    },
     setup_requires=[
         'PySide >= 1.2.2, < 2'
     ],
