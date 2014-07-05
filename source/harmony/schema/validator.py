@@ -3,6 +3,7 @@
 # :license: See LICENSE.txt.
 
 import os
+import pkgutil
 try:
     import json
 except ImportError:
@@ -39,9 +40,9 @@ _Validator = jsonschema.validators.extend(
 )
 
 # Ensure appropriate meta schema set.
-meta_schema_path = os.path.join(os.path.dirname(__file__), 'meta.json')
-with open(meta_schema_path, 'r') as file_handler:
-    meta_schema = json.load(file_handler)
+meta_schema = json.loads(
+    pkgutil.get_data('harmony.schema', 'meta.json')
+)
 
 _Validator.META_SCHEMA = meta_schema
 
