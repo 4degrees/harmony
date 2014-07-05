@@ -3,9 +3,9 @@
 # :license: See LICENSE.txt.
 
 from PySide import QtGui
+import riffle.browser
 
 from .string import String
-from ..filesystem_browser import FilesystemBrowser
 
 
 class FilesystemPath(String):
@@ -18,7 +18,7 @@ class FilesystemPath(String):
         self._browseButton.setToolTip('Browse for path.')
         self._headerLayout.insertWidget(2, self._browseButton, stretch=0)
 
-        self._dialog = FilesystemBrowser()
+        self._dialog = riffle.browser.FilesystemBrowser()
         self._dialog.setMinimumSize(900, 500)
 
     def _postConstruction(self):
