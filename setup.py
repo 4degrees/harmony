@@ -52,7 +52,7 @@ setup(
         'jsonschema >= 2.3.0, < 3',
         'jsonpointer >= 1.3, < 2',
         'PySide >= 1.1.1, < 2',
-        'Riffle >= 0.1.0, <2'
+        'Riffle >= 0.1.0, < 2'
     ],
     tests_require=[
         'pytest >= 2.3.5, < 3'
