@@ -158,7 +158,7 @@ setup(
     description='Asset management schema framework.',
     long_description=open(README_PATH).read(),
     keywords='asset management, schema, pyside, qt, pyqt',
-    url='https://github.com/4degrees/harmony',
+    url='https://gitlab.com/4degrees/harmony',
     author='Martin Pengelly-Phillips',
     author_email='martin@4degrees.ltd.uk',
     license='Apache License (2.0)',
